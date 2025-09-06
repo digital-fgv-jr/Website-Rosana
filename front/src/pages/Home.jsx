@@ -1,6 +1,7 @@
-import Header from "../components/Header";
+import Header from "../components/Header/Header";
 import Hero from "../sections/Hero";
-import Footer from "../components/Footer";
+import Footer from "../components/Footer/Footer";
+;
 
 function Home() {
   return (

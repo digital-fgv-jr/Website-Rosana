@@ -1,0 +1,132 @@
+:root {
+  --header-h: 70px;
+}
+
+.root {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  background-color: #faf9f6;
+  color: #1c2c3c;
+}
+
+.wrap {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 0rem;
+}
+
+/* barra superior */
+.topBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+}
+
+/* logo central */
+.logoLink {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 30%;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* botões laterais */
+.leftBtn,
+.rightBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  background: #faf9f6;
+  border: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+.leftBtn  { margin-left: 1.5rem; margin-top: 1rem; }
+.rightBtn { margin-right: 1.5rem; margin-top: 1rem; }
+.leftBtn:hover,
+.rightBtn:hover { opacity: 0.8; }
+
+/* bloco da direita empilhado */
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+/* ===================== NAV ===================== */
+.nav {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  justify-items: center;
+  align-items: center;
+  padding: 1.25rem 0;
+  gap: 6rem;
+  font-family: 'Bodoni Moda', serif;
+}
+
+.nav a {
+  font-size: clamp(0.95rem, 1.2vw, 1.35rem);
+  color: #1c2c3c;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.nav a:hover { opacity: 0.8; }
+
+/* instagram dentro da nav */
+.navInsta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem; /* diminui espaço entre ícone e texto (antes 0.5rem) */
+  font-size: 0.9rem; /* reduz levemente a fonte */
+  text-decoration: none;
+  color: #1c2c3c;
+  transition: opacity 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.navInstaIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(28, 44, 60, 0.2);
+  border-radius: 9999px;
+  padding: 0.2rem; /* menor que 0.25rem */
+}
+
+.navInstaIcon svg {
+  width: 14px;  /* ícone menor (antes ~16px via h-4 w-4) */
+  height: 14px;
+}
+
+.navInstaName {
+  font-weight: 700;
+  font-size: 0.9rem; /* texto um pouco menor */
+}
+
+/* responsivo */
+@media (max-width: 1024px) {
+  .topBar {
+    height: auto;
+    padding: 1.25rem 0;
+  }
+  .logo { height: 56px; }
+  .nav {
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+  }
+}
