@@ -4,6 +4,7 @@ import Joias from "./pages/joias";
 import CriadasParaVoce from "./pages/criadasparavoce";
 import Eventos from "./pages/eventos";
 import SobreNos from "./pages/sobrenos";
+import Produto from "./pages/produto";
 
 function AppRouter() {
   return (
@@ -14,6 +15,7 @@ function AppRouter() {
         <Route path="/criadas-para-voce" element={<CriadasParaVoce />} />
         <Route path="/eventos" element={<Eventos />} />
         <Route path="/sobre-nos" element={<SobreNos />} />
+        <Route path="/produto/:id" element={<Produto />} />
       </Routes>
     </Router>
   );

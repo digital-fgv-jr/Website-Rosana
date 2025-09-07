@@ -6,6 +6,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        MontserratRegular: ['Montserrat', 'cursive'],
+        RoxboroughCFRegular: ['RoxboroughCF', 'cursive'],
+        RoxboroughCFBold: ['RoxboroughCF', 'cursive'],
+      },      
       colors: {
         brancoperola: "#faf9f6",
     },
