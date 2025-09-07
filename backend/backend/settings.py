@@ -1,13 +1,20 @@
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Loading Environment Variables
+## Loading Environment Variables
 import os
 from dotenv import load_dotenv
 import ast
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = ast.literal_eval(os.environ.get('DEBUG')) == True
+# PSQL
+PSQL_NAME= str(os.environ.get('PSQL_NAME'))
+PSQL_USER= str(os.environ.get('PSQL_USER'))
+PSQL_PASSWORD= str(os.environ.get('PSQL_PASSWORD'))
+PSQL_HOST= str(os.environ.get('PSQL_HOST'))
+PSQL_PORT= str(os.environ.get('PSQL_PORT'))
+
 
 ALLOWED_HOSTS = []
 
@@ -61,8 +68,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': PSQL_NAME,
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': PSQL_PORT,
     }
 }
 
