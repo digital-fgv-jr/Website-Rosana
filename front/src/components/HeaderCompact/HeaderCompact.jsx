@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, Instagram } from "lucide-react";
+import { Search, Instagram, ShoppingCart } from "lucide-react";
 import logo from "../../assets/logo-clara.svg";
 import s from "./HeaderCompact.module.css";
 
@@ -21,7 +21,7 @@ export default function HeaderCompact() {
   return (
     <div className={`${s.root} ${show ? s.show : s.hide}`} aria-hidden={!show} role="banner">
       <div className={s.wrap}>
-        {/* Linha 1: logo | busca | insta */}
+        {/* Linha 1: logo | busca | ações (insta + carrinho) */}
         <div className={s.row1}>
           <a href="/" className={s.logoLink} aria-label="Página inicial">
             <img src={logo} alt="Ro Jewellery" className={s.logo} />
@@ -37,18 +37,26 @@ export default function HeaderCompact() {
             <Search className={s.searchIcon} aria-hidden />
           </div>
 
-          <a
-            href="https://instagram.com/roalves_jewellery"
-            target="_blank"
-            rel="noreferrer"
-            className={s.navInsta}
-            aria-label="Instagram roalves_jewellery"
-          >
-            <span className={s.navInstaIcon}>
+          {/* Ações à direita: Instagram (só ícone) + Carrinho */}
+          <div className={s.actions}>
+            <a
+              href="https://instagram.com/roalves_jewellery"
+              target="_blank"
+              rel="noreferrer"
+              className={s.instaBtn}
+              aria-label="Instagram roalves_jewellery"
+            >
               <Instagram />
-            </span>
-            <span className={s.navInstaName}>roalves_jewellery</span>
-          </a>
+            </a>
+
+            <a
+              href="/carrinho"
+              className={s.iconBtn}
+              aria-label="Abrir carrinho"
+            >
+              <ShoppingCart />
+            </a>
+          </div>
         </div>
 
         {/* Linha 2: navegação compacta */}

@@ -15,7 +15,7 @@ export default function Footer() {
         />
 
         <p className={styles.copyright}>
-          Copyright © {year} - Todos os direitos reservados.
+          Copyright © {year} - Todos os direitos reservados. Desenvolvido pela FGV Jr.
         </p>
       </div>
     </footer>

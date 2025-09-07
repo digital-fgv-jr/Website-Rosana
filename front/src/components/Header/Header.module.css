@@ -3,7 +3,7 @@
 }
 
 .root {
-  position: relative;   /* ou static */
+  position: relative; /* header normal não-sticky */
   width: 100%;
   background-color: #faf9f6;
   color: #1c2c3c;
@@ -17,11 +17,11 @@
   padding: 0 0rem;
 }
 
-/* barra superior */
+/* ===== Barra superior ===== */
 .topBar {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: center;          /* alinha verticalmente */
   justify-content: space-between;
   height: var(--header-h);
 }
@@ -33,37 +33,85 @@
   transform: translateX(-50%);
   top: 15%;
 }
-
 .logo {
   height: 65px;
   width: auto;
   object-fit: contain;
 }
 
-/* botões laterais */
+/* ===== Ações laterais ===== */
 .leftBtn,
 .rightBtn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  height: 32px;                 /* mesma altura dos ícones/botões */
+  line-height: 1;
   font-size: 0.875rem;
   background: #faf9f6;
   border: 0;
   cursor: pointer;
   transition: opacity 0.2s ease;
   font-family: 'Montserrat', sans-serif;
+  margin: 0;                    /* zera margens antigas que deslocavam */
+  padding: 0;                   /* aparência “texto+ícone” limpa */
 }
-.leftBtn { margin-left: 0.5rem; margin-top: 1rem; text-decoration: underline; }
-.rightBtn { margin-right: 2rem; margin-top: 1rem; }
+.leftBtn {
+  margin-left: 0.5rem;
+  text-decoration: underline;
+}
 .leftBtn:hover,
-.rightBtn:hover { opacity: 0.8; }
+.rightBtn:hover {
+  opacity: 0.8;
+}
 
-/* bloco da direita empilhado */
+/* Direita: Buscar/Input + Carrinho */
 .rightCol {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.5rem;                 /* espaço entre Buscar/Input e carrinho */
+  margin-right: 0.75rem;
+}
+
+/* Input de busca (mesma altura do botão Buscar) */
+.searchInput {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 32px;                /* igual ao .rightBtn */
+  padding: 0 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  min-width: 160px;
+  outline: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;         /* centra o texto verticalmente */
+}
+.searchInput:focus { border-color: #1c2c3c; }
+
+/* Ícone/botão do carrinho */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #1c2c3c;              /* lucide usa stroke=currentColor */
+  border: 1px solid #1c2c3c;
+  border-radius: 50%;
+  background: transparent;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.iconBtn:hover {
+  background: #1c2c3c;
+  color: #fff;
+  border-color: #1c2c3c;
+}
+.iconSvg {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 /* ===================== NAV ===================== */
@@ -78,7 +126,6 @@
   font-family: 'Bodoni Moda', serif;
   white-space: nowrap;
 }
-
 .nav a {
   font-size: clamp(0.95rem, 1.2vw, 1.35rem);
   color: #1c2c3c;
@@ -91,49 +138,36 @@
 .navInsta {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem; /* diminui espaço entre ícone e texto (antes 0.5rem) */
-  font-size: 0.9rem; /* reduz levemente a fonte */
+  gap: 0.35rem;                /* espaço entre ícone e texto */
+  font-size: 0.9rem;
   text-decoration: none;
   color: #1c2c3c;
   transition: opacity 0.2s ease;
   font-family: 'Montserrat', sans-serif;
 }
-
-/* WRAPPER CIRCULAR */
-/* wrapper circular */
 .navInstaIcon {
-  display: grid;           /* centralização perfeita */
+  display: grid;
   place-items: center;
-  width: 28px;             /* pode usar 32px se preferir maior */
+  width: 28px;
   height: 28px;
   background: #000;
   border-radius: 50%;
-  padding: 0;
-  line-height: 0;          /* zera baseline do span */
+  line-height: 0;
   box-sizing: border-box;
 }
-
-/* o SVG */
 .navInstaIcon svg {
-  display: block;          /* remove gap inline */
-  width: 18px;             /* teste 16px se achar mais “crisp” */
+  display: block;
+  width: 18px;
   height: 18px;
-  color: #fff;             /* lucide usa stroke=currentColor */
-  margin: 0;
-  /* microajuste óptico, se ainda parecer 1px fora */
-  transform: translateY(-0.5px); /* ajuste fino: -0.5 / 0 / +0.5 */
+  color: #fff;
+  transform: translateY(-0.5px); /* ajuste óptico */
 }
-
-
-
-
-
 .navInstaName {
   font-weight: 700;
-  font-size: 0.9rem; /* texto um pouco menor */
+  font-size: 0.9rem;
 }
 
-/* responsivo */
+/* ===================== Responsivo ===================== */
 @media (max-width: 1024px) {
   .topBar {
     height: auto;
@@ -145,18 +179,3 @@
     row-gap: 0.75rem;
   }
 }
-
-.searchInput {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0.4rem 0.75rem;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.9rem;
-  min-width: 160px;
-  outline: none;
-}
-.searchInput:focus {
-  border-color: #1c2c3c;
-}
-

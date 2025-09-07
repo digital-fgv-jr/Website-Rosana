@@ -1,20 +1,17 @@
 .banner {
   position: fixed;
-
-  /* em vez de bottom: 20px; use top abaixo do meio */
-  /* fica entre 52vh e o máximo permitido sem encostar no rodapé */
-  top: clamp(52vh, 58vh, calc(100vh - 96px));
-  bottom: auto;                /* <- importante para não conflitar */
-
+  top: auto;              /* garante que não fica preso no topo */
+  bottom: 0;              /* gruda no rodapé (sticky bottom) */
   left: 0;
-  right: 0;                    /* mantém largura total */
+  right: 0;
   width: 100%;
   background-color: #F7E7CE;
   font-family: 'Montserrat', sans-serif;
   z-index: 1000;
   box-shadow: 0 -2px 5px rgba(0,0,0,.08);
+  /* safe-area iOS (opcional) */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
-
 
 /* layout largo, confortável e sem espremer nada */
 .inner {

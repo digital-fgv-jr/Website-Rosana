@@ -11,13 +11,13 @@
   --search-height: 32px;
   --search-radius: 9999px;
   --search-icon-size: 16px;
-  --search-icon-right: 0px; /* encosta mais no canto */
+  --search-icon-right: 6px; /* encosta mais no canto */
   --search-input-pr: calc(var(--search-icon-right) + var(--search-icon-size) + 10px);
 
-  /* logo e insta (compactos) */
+  /* logo e ícones à direita (compactos) */
   --logo-h: 40px;
-  --insta-circle: 24px;
-  --insta-icon: 18px;
+  --icon-circle: 28px; /* tamanho dos botões redondos (insta/cart) */
+  --icon-size: 18px;   /* tamanho dos ícones dentro do círculo */
 
   /* espaçamentos verticais */
   --wrap-py: 6px;
@@ -70,7 +70,7 @@
 .searchInput {
   width: 100%;
   height: var(--search-height);
-  padding: 0 var(--search-input-pr) 0 14px; /* direita calculada para o ícone */
+  padding: 0 var(--search-input-pr) 0 14px; /* direita calculada p/ ícone */
   border: 0;
   outline: none;
   border-radius: var(--search-radius);
@@ -92,31 +92,55 @@
   pointer-events: none;
 }
 
-/* insta à direita, compacto */
-.navInsta {
+/* ====== AÇÕES À DIREITA (insta + carrinho) ====== */
+.actions {
   justify-self: end;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: var(--fg);
-  text-decoration: none;
+  gap: 10px; /* espaço entre insta e carrinho */
 }
-.navInstaIcon {
-  display: grid;           /* centralização perfeita */
+
+/* Instagram: círculo preto com ícone branco */
+.instaBtn {
+  display: grid;
   place-items: center;
-  width: 28px;             /* pode usar 32px se preferir maior */
-  height: 28px;
+  width: var(--icon-circle);
+  height: var(--icon-circle);
   border-radius: 50%;
-  padding: 0;
-  line-height: 0;          /* zera baseline do span */
-  box-sizing: border-box;
-  background: #000
+  background: #000;
+  line-height: 0;
 }
-.navInstaIcon svg {
-  width: var(--insta-icon); height: var(--insta-icon);
-  display: block; color: #fff; transform: translateY(-0.3px);
+.instaBtn svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  display: block;
+  color: #fff;                 /* lucide usa stroke=currentColor */
+  transform: translateY(-0.3px); /* ajuste óptico */
 }
-.navInstaName { font-weight: 700; font-size: 0.85rem; }
+
+/* Carrinho: círculo com borda (outline) que inverte no hover */
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: var(--icon-circle);
+  height: var(--icon-circle);
+  border-radius: 50%;
+  border: 1px solid var(--fg);
+  color: var(--fg);
+  background: transparent;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+  line-height: 0;
+}
+.iconBtn:hover {
+  background: var(--fg);
+  color: #fff;
+  border-color: var(--fg);
+}
+.iconBtn svg {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  display: block;
+}
 
 /* =================== LINHA 2 (NAV) =================== */
 .nav {
@@ -142,7 +166,7 @@
     grid-template-columns: 1fr minmax(220px, 1fr) auto;
     gap: 12px;
   }
-  .logo { height: 30px; }
+  .logo { height: 34px; }
   .searchInput { height: 30px; font-size: 13px; }
 }
 

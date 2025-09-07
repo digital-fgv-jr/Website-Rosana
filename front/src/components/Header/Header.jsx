@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Search, Instagram } from "lucide-react";
+import { MapPin, Search, Instagram, ShoppingCart } from "lucide-react";
 import logo from "../../assets/logo-clara.svg";
 import styles from "./Header.module.css";
 
@@ -23,17 +23,9 @@ export default function Header() {
             <img src={logo} alt="Ro Jewellery" className={styles.logo} />
           </a>
 
-          {/* botão Buscar (lado direito) */}
+          {/* Buscar + Carrinho (lado direito) */}
           <div className={styles.rightCol}>
-            {!searchOpen ? (
-              <button
-                className={styles.rightBtn}
-                onClick={() => setSearchOpen(true)}
-              >
-                <Search className="h-4 w-4" />
-                Buscar
-              </button>
-            ) : (
+            {searchOpen ? (
               <input
                 type="text"
                 placeholder="Buscar joias..."
@@ -43,7 +35,24 @@ export default function Header() {
                 autoFocus
                 onBlur={() => setSearchOpen(false)}
               />
+            ) : (
+              <button
+                className={styles.rightBtn}
+                onClick={() => setSearchOpen(true)}
+              >
+                <Search className="h-4 w-4" />
+                Buscar
+              </button>
             )}
+
+            {/* Carrinho */}
+            <a
+              href="/carrinho"
+              className={styles.iconBtn}
+              aria-label="Abrir carrinho"
+            >
+              <ShoppingCart className={styles.iconSvg} />
+            </a>
           </div>
         </div>
 
