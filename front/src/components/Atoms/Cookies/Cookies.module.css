@@ -1,0 +1,108 @@
+.banner {
+  position: fixed;
+
+  /* em vez de bottom: 20px; use top abaixo do meio */
+  /* fica entre 52vh e o máximo permitido sem encostar no rodapé */
+  top: clamp(52vh, 58vh, calc(100vh - 96px));
+  bottom: auto;                /* <- importante para não conflitar */
+
+  left: 0;
+  right: 0;                    /* mantém largura total */
+  width: 100%;
+  background-color: #F7E7CE;
+  font-family: 'Montserrat', sans-serif;
+  z-index: 1000;
+  box-shadow: 0 -2px 5px rgba(0,0,0,.08);
+}
+
+
+/* layout largo, confortável e sem espremer nada */
+.inner {
+  max-width: 1180px;            /* controla a largura do conteúdo */
+  margin: 0 auto;
+  padding: 16px 28px;
+
+  display: grid;
+  /* texto flexível | botão do tamanho do conteúdo */
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: 24px;
+  align-items: center;
+}
+
+/* duas linhas “limpas” com espaçamento bom */
+.text {
+  margin: 0;
+  color: #1c2c3c;
+  font-size: 15px;
+  line-height: 1.5;
+  letter-spacing: .2px;
+
+  /* limita a largura do parágrafo para não virar uma linha gigante */
+  max-width: 900px;
+}
+
+.link {
+  text-decoration: underline;
+  color: #000;
+  font-weight: 700;
+}
+
+/* ===== ajuste no botão ===== */
+.btn {
+  /* impede o Grid de “espremer” o conteúdo */
+  min-width: max-content;
+
+  /* tipografia mais solta */
+  letter-spacing: 0.4px;
+  line-height: 1.2;
+
+  /* layout do botão */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  white-space: nowrap;              /* mantém numa linha */
+  padding: 10px 22px;               /* mais respiro lateral */
+  font-size: 14.5px;                /* ajuste fino */
+  font-weight: 600;                 /* 700 deixa mais “fechado” */
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid #1c2c3c;
+  color: #1c2c3c;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+  box-shadow: 0 0 0 1px rgba(28,44,60,.02) inset;
+}
+
+.btn:hover {
+  background: #1c2c3c;
+  color: #fff;
+  border-color: #1c2c3c;
+}
+
+/* ===== Responsivo ===== */
+@media (max-width: 720px) {
+  .inner {
+    grid-template-columns: 1fr;   /* botão vai para baixo */
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .text {
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    min-width: 0;                 /* libera no mobile */
+    text-align: center;
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+}
+
+/* largura mínima confortável no desktop (opcional) */
+@media (min-width: 721px) {
+  .btn { min-width: 150px; }      /* ajuste 240–280px ao seu gosto */
+}

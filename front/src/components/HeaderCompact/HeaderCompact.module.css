@@ -1,0 +1,158 @@
+/* =================== CORES E TOKENS =================== */
+:root {
+  /* cores */
+  --bg: #faf9f6;
+  --fg: #1c2c3c;
+  --beige: #F7E7CE; /* fundo da busca */
+
+  /* search (compacta) */
+  --search-width-min: 240px;
+  --search-width-max: 400px;
+  --search-height: 32px;
+  --search-radius: 9999px;
+  --search-icon-size: 16px;
+  --search-icon-right: 0px; /* encosta mais no canto */
+  --search-input-pr: calc(var(--search-icon-right) + var(--search-icon-size) + 10px);
+
+  /* logo e insta (compactos) */
+  --logo-h: 40px;
+  --insta-circle: 24px;
+  --insta-icon: 18px;
+
+  /* espaçamentos verticais */
+  --wrap-py: 6px;
+  --row1-py: 4px;
+  --nav-gap: 1.25rem;
+  --nav-py-top: 6px;
+}
+
+/* =================== BARRA FIXA & ANIMAÇÃO =================== */
+.root {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: var(--bg);
+  z-index: 60;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  transform: translateY(-110%);
+  opacity: 0;
+  transition: transform .22s ease, opacity .22s ease;
+  will-change: transform, opacity;
+  backdrop-filter: saturate(1.1);
+}
+
+.show { transform: translateY(0); opacity: 1; }
+.hide { pointer-events: none; }
+
+/* wrapper centralizado */
+.wrap {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--wrap-py) 0;
+  color: var(--fg);
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* =================== LINHA 1 =================== */
+.row1 {
+  display: grid;
+  grid-template-columns: 1fr minmax(var(--search-width-min), var(--search-width-max)) 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: var(--row1-py) 0;
+}
+
+.logoLink { justify-self: start; }
+.logo { height: var(--logo-h); width: auto; display: block; }
+
+/* busca central */
+.searchBox { position: relative; justify-self: center; width: 100%; }
+
+.searchInput {
+  width: 100%;
+  height: var(--search-height);
+  padding: 0 var(--search-input-pr) 0 14px; /* direita calculada para o ícone */
+  border: 0;
+  outline: none;
+  border-radius: var(--search-radius);
+  background: var(--beige);
+  font-size: 13.5px;
+  color: var(--fg);
+  font-family: 'Montserrat', sans-serif;
+}
+.searchInput::placeholder { color: rgba(28,44,60,.55); }
+
+.searchIcon {
+  position: absolute;
+  right: var(--search-icon-right);
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--search-icon-size);
+  height: var(--search-icon-size);
+  color: var(--fg);
+  pointer-events: none;
+}
+
+/* insta à direita, compacto */
+.navInsta {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg);
+  text-decoration: none;
+}
+.navInstaIcon {
+  display: grid;           /* centralização perfeita */
+  place-items: center;
+  width: 28px;             /* pode usar 32px se preferir maior */
+  height: 28px;
+  border-radius: 50%;
+  padding: 0;
+  line-height: 0;          /* zera baseline do span */
+  box-sizing: border-box;
+  background: #000
+}
+.navInstaIcon svg {
+  width: var(--insta-icon); height: var(--insta-icon);
+  display: block; color: #fff; transform: translateY(-0.3px);
+}
+.navInstaName { font-weight: 700; font-size: 0.85rem; }
+
+/* =================== LINHA 2 (NAV) =================== */
+.nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+  align-items: center;
+  gap: var(--nav-gap);
+  padding: var(--nav-py-top) 0 2px;
+  font-family: 'Bodoni Moda', serif;
+}
+.nav a {
+  font-size: clamp(0.85rem, 0.95vw, 1.05rem);
+  color: var(--fg);
+  text-decoration: none;
+  transition: opacity .2s ease;
+}
+.nav a:hover { opacity: .8; }
+
+/* =================== RESPONSIVO =================== */
+@media (max-width: 880px) {
+  .row1 {
+    grid-template-columns: 1fr minmax(220px, 1fr) auto;
+    gap: 12px;
+  }
+  .logo { height: 30px; }
+  .searchInput { height: 30px; font-size: 13px; }
+}
+
+@media (max-width: 640px) {
+  .wrap { padding: 6px 0; }
+  .row1 { grid-template-columns: auto 1fr auto; }
+  .nav { display: none; } /* opcional: esconder a nav no sticky no mobile */
+}
+
+/* acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  .root { transition: none; }
+}

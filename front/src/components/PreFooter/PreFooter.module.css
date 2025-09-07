@@ -1,0 +1,148 @@
+:root {
+  --bg: #faf9f6;
+  --fg: #1c2c3c;
+  --accent: #c9bd8f;   /* bege dourado do print */
+}
+
+.root {
+  background: var(--bg);
+  color: var(--fg);
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ===== Linha superior com divisor e "Voltar ao topo" ===== */
+.topBar {
+  position: relative;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 18px 0 8px;
+}
+
+/* linha fina atravessando a largura */
+.topBar::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: 30px;                   /* alinha com o texto */
+  height: 1px;
+  background: rgba(28,44,60,.6);
+}
+
+.toTopBtn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.toTopIcon {
+  display: grid;
+  place-items: center;
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: 50%;
+  line-height: 0;
+}
+.toTopIcon svg {
+  width: 16px; height: 16px;
+  color: #fff;
+}
+
+.toTopText {
+  font-size: 12px;
+  letter-spacing: .1em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ===== Conteúdo ===== */
+.wrap {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 14px 0 24px;
+}
+
+/* três colunas + área do insta à direita */
+.grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr 1.1fr auto;
+  gap: 2.25rem;
+  align-items: start;
+}
+
+/* colunas de links */
+.colTitle {
+  font-family: 'Bodoni Moda', serif;
+  font-size: 1.05rem;
+  margin: 0 0 10px 0;
+  color: var(--fg);
+}
+
+.colList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.colList li + li { margin-top: 8px; }
+
+.colList a {
+  color: rgba(28,44,60,.85);
+  text-decoration: none;
+  font-size: .92rem;
+  transition: opacity .2s ease;
+}
+.colList a:hover { opacity: .8; }
+
+/* insta à direita (bege, como no print) */
+.insta {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.instaIcon {
+  display: grid;           /* centralização perfeita */
+  place-items: center;
+  width: 28px;             /* pode usar 32px se preferir maior */
+  height: 28px;
+  border-radius: 50%;
+  padding: 0;
+  line-height: 0;          /* zera baseline do span */
+  box-sizing: border-box;
+  background: var(--accent);
+
+}
+.instaIcon svg {
+  width: 18px; height: 18px;
+  color: #fff;
+}
+.instaHandle { font-size: .95rem; }
+
+/* ===== Responsivo ===== */
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 1.5rem;
+  }
+  .insta { justify-self: start; }
+}
+
+@media (max-width: 560px) {
+  .topBar::before { top: 28px; }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

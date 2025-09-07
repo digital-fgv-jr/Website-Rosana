@@ -1,14 +1,13 @@
 :root {
-  --header-h: 70px;
+  --header-h: 65px;
 }
 
 .root {
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  position: relative;   /* ou static */
   width: 100%;
   background-color: #faf9f6;
   color: #1c2c3c;
+  z-index: 1;
 }
 
 .wrap {
@@ -32,11 +31,11 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: 30%;
+  top: 15%;
 }
 
 .logo {
-  height: 60px;
+  height: 65px;
   width: auto;
   object-fit: contain;
 }
@@ -54,8 +53,8 @@
   transition: opacity 0.2s ease;
   font-family: 'Montserrat', sans-serif;
 }
-.leftBtn  { margin-left: 1.5rem; margin-top: 1rem; }
-.rightBtn { margin-right: 1.5rem; margin-top: 1rem; }
+.leftBtn { margin-left: 0.5rem; margin-top: 1rem; text-decoration: underline; }
+.rightBtn { margin-right: 2rem; margin-top: 1rem; }
 .leftBtn:hover,
 .rightBtn:hover { opacity: 0.8; }
 
@@ -75,8 +74,9 @@
   justify-items: center;
   align-items: center;
   padding: 1.25rem 0;
-  gap: 6rem;
+  gap: 12rem;
   font-family: 'Bodoni Moda', serif;
+  white-space: nowrap;
 }
 
 .nav a {
@@ -99,19 +99,34 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+/* WRAPPER CIRCULAR */
+/* wrapper circular */
 .navInstaIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(28, 44, 60, 0.2);
-  border-radius: 9999px;
-  padding: 0.2rem; /* menor que 0.25rem */
+  display: grid;           /* centralização perfeita */
+  place-items: center;
+  width: 28px;             /* pode usar 32px se preferir maior */
+  height: 28px;
+  background: #000;
+  border-radius: 50%;
+  padding: 0;
+  line-height: 0;          /* zera baseline do span */
+  box-sizing: border-box;
 }
 
+/* o SVG */
 .navInstaIcon svg {
-  width: 14px;  /* ícone menor (antes ~16px via h-4 w-4) */
-  height: 14px;
+  display: block;          /* remove gap inline */
+  width: 18px;             /* teste 16px se achar mais “crisp” */
+  height: 18px;
+  color: #fff;             /* lucide usa stroke=currentColor */
+  margin: 0;
+  /* microajuste óptico, se ainda parecer 1px fora */
+  transform: translateY(-0.5px); /* ajuste fino: -0.5 / 0 / +0.5 */
 }
+
+
+
+
 
 .navInstaName {
   font-weight: 700;
@@ -130,3 +145,18 @@
     row-gap: 0.75rem;
   }
 }
+
+.searchInput {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  min-width: 160px;
+  outline: none;
+}
+.searchInput:focus {
+  border-color: #1c2c3c;
+}
+
