@@ -6,15 +6,15 @@ export default function DropdownSection() {
   ];
 
   return (
-    <section className="my-16 max-w-[90%] mx-auto flex justify-between items-start">
+    <section className="my-16 max-w-[90%] mx-auto flex justify-between items-start bg-[#faf9f6]">
       {/* Blocos de categorias */}
       <div className="flex gap-36">
         {dropdowns.map((dd, idx) => (
           <div key={idx}>
-            <h3 className="font-semibold mb-3 text-gray-900">{dd.title}</h3>
+            <h3 className="font-semibold mb-3 text-[#1c2c3c]">{dd.title}</h3>
             <ul className="space-y-2">
               {dd.items.map((item, idx) => (
-                <li key={idx} className="text-gray-800 hover:text-gray-600 cursor-pointer">
+                <li key={idx} className="text-[#1c2c3c] hover:text-[#c2b280] cursor-pointer">
                   {item}
                 </li>
               ))}
@@ -25,10 +25,10 @@ export default function DropdownSection() {
 
       {/* Botões de Instagram e WhatsApp */}
       <div className="flex flex-col gap-4 ml-8">
-        <button className="px-5 py-3 bg-pink-500 text-white rounded hover:bg-pink-600 transition">
+        <button className="px-5 py-3 bg-pink-500 text-[#faf9f6] rounded hover:bg-pink-600 transition">
           Instagram
         </button>
-        <button className="px-5 py-3 bg-green-500 text-white rounded hover:bg-green-600 transition">
+        <button className="px-5 py-3 bg-green-500 text-[#faf9f6] rounded hover:bg-green-600 transition">
           WhatsApp
         </button>
       </div>

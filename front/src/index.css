@@ -71,3 +71,24 @@ button:focus-visible {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+  font-family: 'RoxboroughCF';
+  src: url('./assets/fonts/RoxboroughCF-Bold.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'RoxboroughCF';
+  src: url('./assets/fonts/RoxboroughCF-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/fonts/Montserrat-Regular.otf') format('otf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
