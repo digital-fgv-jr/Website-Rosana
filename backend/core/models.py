@@ -1,4 +1,4 @@
-# Database v8.3.17
+# Database v8.4.0
 
 from django.db import models
 from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
@@ -195,6 +195,13 @@ class Tamanho(models.Model):
     def __str__(self):
         return f'{self.nome}: {self.valor}'
 
+class TamanhoProduto(models.Model):
+    tamanho = models.ForeignKey(Tamanho, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('tamanho', 'produto')
+
 class Carrinho(models.Model):
     fechado = models.BooleanField(default=False, null=False)
 
@@ -224,8 +231,8 @@ class Pedido(models.Model):
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens', on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
+    tamanho = models.ForeignKey(TamanhoProduto, on_delete=models.PROTECT)
     quantidade = models.PositiveIntegerField()
-
     preco_unitario_congelado = models.DecimalField(max_digits=12, decimal_places=2)
 
     def __str__(self):
@@ -233,6 +240,7 @@ class ItemPedido(models.Model):
 
 class ProdutoCarrinho(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    tamanho = models.ForeignKey(TamanhoProduto, on_delete=models.PROTECT)
     carrinho = models.ForeignKey(Carrinho, on_delete=models.CASCADE)
     quantidade = models.PositiveIntegerField(validators=[MinValueValidator(1)])
 
@@ -245,10 +253,3 @@ class ImagemProduto(models.Model):
 
     class Meta:
         unique_together = ('imagem', 'produto')
-
-class TamanhoProduto(models.Model):
-    tamanho = models.ForeignKey(Tamanho, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('tamanho', 'produto')
