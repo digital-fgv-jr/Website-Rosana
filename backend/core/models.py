@@ -1,4 +1,4 @@
-# Database v8.4.0
+# Database v10.0.9
 
 from django.db import models
 from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
@@ -35,19 +35,6 @@ class Endereco(models.Model):
         ('SP', 'São Paulo'),
         ('TO', 'Tocantins'),
     )
-    uf = models.CharField(
-        max_length=2, 
-        blank=False, 
-        null=False, 
-        choices=UF, 
-        default='SP',
-        validators=[
-            MinLengthValidator(2),
-            ],
-        )
-    cidade = models.CharField(max_length=32, blank=False, null=False)
-    logradouro = models.CharField(max_length=128, blank=False, null=False)
-    bairro = models.CharField(max_length=128, blank=False, null=False)
     CEPValidator = RegexValidator(
         regex=r'^\d{5}-\d{3}$',
         message='O CEP deve estar no formato XXXXX-XXX.'
@@ -61,8 +48,29 @@ class Endereco(models.Model):
             ],
         )
     
+    logradouro = models.CharField(max_length=128, blank=False, null=False)
+    numero = models.PositiveIntegerField(blank=False, null=False, verbose_name='Número')
+    complemento = models.CharField(max_length=128, blank=True, null=True)
+    bairro = models.CharField(max_length=128, blank=False, null=False)
+    cidade = models.CharField(max_length=32, blank=False, null=False)
+    uf = models.CharField(
+        max_length=2, 
+        blank=False, 
+        null=False, 
+        choices=UF, 
+        default='SP',
+        validators=[
+            MinLengthValidator(2),
+            ], 
+        verbose_name='UF'
+        )
+    
     def __str__(self):
         return f'{self.logradouro}. {self.cep}'
+    
+    class Meta:
+        verbose_name = 'Endereço'
+        verbose_name_plural = 'Endereços'
 
 class Contato(models.Model):
     nome = models.CharField(max_length=64, blank=False, null=False)
@@ -73,29 +81,62 @@ class Contato(models.Model):
         null=False,
         validators=[
             CPFValidator,
-            ],
+            ], 
+        verbose_name='CPF'
         )
-    email = models.EmailField(max_length=128, blank=False, null=False)
+    email = models.EmailField(max_length=128, blank=False, null=False, verbose_name='E-mail')
 
     def __str__(self):
         return f'{self.nome} {self.sobrenome} ({self.email})'
     
+    class Meta:
+        verbose_name = 'Contato'
+        verbose_name_plural = 'Contatos'
+    
 class ContatoLoja(models.Model):
-    contato = models.OneToOneField(Contato, on_delete=models.CASCADE, primary_key=True)
-    whatsapp = models.CharField(max_length=11)
-    telefone = models.CharField(max_length=11)
+    contato = models.OneToOneField(Contato, on_delete=models.CASCADE, primary_key=True, verbose_name='Contato da Loja')
+    whatsapp = models.CharField(
+        max_length=14,                        
+        validators=[
+            MinLengthValidator(13),
+            ], 
+        verbose_name='WhatsApp'
+        )
+    telefone = models.CharField(
+        max_length=14,                        
+        validators=[
+            MinLengthValidator(13),
+            ],
+        )
     instagram = models.CharField(max_length=32)
     cnpj = models.CharField(
-        max_length=14,
+        max_length=18,
         null=True,
         blank=True,
         validators=[
-            MinLengthValidator(14),
+            MinLengthValidator(18),
             ],
+        verbose_name='CNPJ'
         )
     
     def __str__(self):
         return f'Loja: {self.instagram} ({self.telefone})'
+    
+    class Meta:
+        verbose_name = 'Contato da Loja'
+        verbose_name_plural = 'Contatos das Lojas'
+
+class ContatoNormal(Contato):
+    class Meta:
+        proxy = True
+        verbose_name = 'Contato (Cliente)'
+        verbose_name_plural = 'Contatos (Clientes)'
+
+class ContatoDeLoja(Contato):
+    class Meta:
+        proxy = True
+        verbose_name = 'Contato (Loja)'
+        verbose_name_plural = 'Contatos (Lojas)'
 
 class InformacoesEntrega(models.Model):
     entrega_estimada = models.DateField()
@@ -108,33 +149,45 @@ class InformacoesEntrega(models.Model):
         validators=[
             MinValueValidator(0),
         ],
-    )
-    data_hora_finalizado = models.DateTimeField(null=True, blank=True)
+    verbose_name='Preço do Frete')
+    data_hora_finalizado = models.DateTimeField(null=True, blank=True, verbose_name='Finalizado')
 
     def __str__(self):
         return f'Entrega {self.rastreador}'
+    
+    class Meta:
+        verbose_name = 'Informações da Entrega'
+        verbose_name_plural = 'Informações das Entregas'
 
 class Loja(models.Model):
-    apelido = models.CharField(max_length=32)
-    contato = models.ForeignKey(ContatoLoja, null=True, on_delete=models.SET_NULL)
-    endereco = models.ForeignKey(Endereco, null=True, on_delete=models.SET_NULL)
+    apelido = models.CharField(max_length=32, verbose_name='Apelido da Loja')
+    contato = models.OneToOneField(ContatoDeLoja, null=True, on_delete=models.SET_NULL, verbose_name='Contato da Loja')
+    endereco = models.ForeignKey(Endereco, null=True, on_delete=models.SET_NULL, verbose_name='Endereço da Loja')
 
     def __str__(self):
         return f'Loja {self.apelido}'
+    
+    class Meta:
+        verbose_name = 'Loja'
+        verbose_name_plural = 'Lojas'
 
 class Categoria(models.Model):
     loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
-    nome_categoria = models.CharField(max_length=64)
+    nome_categoria = models.CharField(max_length=64, verbose_name='Nome da Categoria')
 
     def __str__(self):
         return f'Categoria {self.nome_categoria}'
+    
+    class Meta:
+        verbose_name = 'Categoria'
+        verbose_name_plural = 'Categorias'
 
 class Produto(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     nome = models.CharField(max_length=128)
-    descricao = models.TextField()
-    qtd_disponivel = models.PositiveIntegerField(default=1)
-    qtd_em_compra = models.PositiveIntegerField(default=0)
+    descricao = models.TextField(verbose_name='Descrição')
+    qtd_disponivel = models.PositiveIntegerField(default=1, verbose_name='Quantidade Disponível')
+    qtd_em_compra = models.PositiveIntegerField(default=0, verbose_name='Quantidade em Compra')
     preco = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -142,7 +195,7 @@ class Produto(models.Model):
         validators=[
             MinValueValidator(0),
         ],
-    )
+    verbose_name='Preço')
     peso = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -168,25 +221,35 @@ class Produto(models.Model):
         indexes = [
             models.Index(fields=['nome'], name='idx_produto_nome')
         ]
-    
+        verbose_name = 'Produto'
+        verbose_name_plural = 'Produtos'
+
     def __str__(self):
         return f'Produto {self.nome}'
 
 class DetalheProduto(models.Model):
     propriedade = models.CharField(max_length=64)
-    descricao = models.TextField(max_length=128)
+    descricao = models.TextField(max_length=128, verbose_name='Descrição')
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'Detalhe {self.propriedade} - {self.produto}'
 
+    class Meta:
+        verbose_name = 'Detalhe do Produto'
+        verbose_name_plural = 'Detalhes dos Produtos'
+
 
 class Imagem(models.Model):
-    imagem = models.ImageField(upload_to='imagens/')
-    alt_text = models.CharField(max_length=128, blank=True)
+    titulo = models.CharField(max_length=128, blank=True, verbose_name='Título')
+    imagem = models.ImageField(upload_to='images/')
 
     def __str__(self):
-        return self.alt_text or self.imagem.name
+        return self.titulo or self.imagem.name
+    
+    class Meta:
+        verbose_name = 'Imagem'
+        verbose_name_plural = 'Imagens'
 
 class Tamanho(models.Model):
     nome = models.CharField(max_length=32)
@@ -194,6 +257,10 @@ class Tamanho(models.Model):
 
     def __str__(self):
         return f'{self.nome}: {self.valor}'
+    
+    class Meta:
+        verbose_name = 'Tamanho'
+        verbose_name_plural = 'Tamanhos'
 
 class TamanhoProduto(models.Model):
     tamanho = models.ForeignKey(Tamanho, on_delete=models.CASCADE)
@@ -201,12 +268,20 @@ class TamanhoProduto(models.Model):
 
     class Meta:
         unique_together = ('tamanho', 'produto')
+    
+    class Meta:
+        verbose_name = 'Tamanho do Produto'
+        verbose_name_plural = 'Tamanhos dos Produtos'
 
 class Carrinho(models.Model):
     fechado = models.BooleanField(default=False, null=False)
 
     def __str__(self):
         return f'Carrinho {'Fechado' if self.fechado == True else 'Aberto'}'
+    
+    class Meta:
+        verbose_name = 'Carrinho'
+        verbose_name_plural = 'Carrinhos'
 
 class Pedido(models.Model):
     STATUS = (
@@ -215,28 +290,36 @@ class Pedido(models.Model):
         ('A', 'Aguardando Pagamento'),
         ('R', 'Recusada'),
     )
-    contato_cliente = models.ForeignKey(Contato, on_delete=models.PROTECT)
-    endereco_entrega = models.ForeignKey(Endereco, on_delete=models.PROTECT)
+    contato_cliente = models.ForeignKey(Contato, on_delete=models.PROTECT, verbose_name='Contado do Cliente')
+    endereco_entrega = models.ForeignKey(Endereco, on_delete=models.PROTECT, verbose_name='Endereço de Entrega')
 
-    info_entrega = models.ForeignKey(InformacoesEntrega, on_delete=models.PROTECT)
-    data_hora_criacao = models.DateTimeField(auto_now_add=True)
+    info_entrega = models.ForeignKey(InformacoesEntrega, on_delete=models.PROTECT, verbose_name='Informações de Entrega')
+    data_hora_criacao = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
     status = models.CharField(max_length=1, choices=STATUS, blank=False, null=False, default='A')
     
-    id_pagamento_externo = models.CharField(max_length=255, blank=True, null=True)
-    url_pagamento = models.URLField(max_length=255, blank=True, null=True)
+    id_pagamento_externo = models.CharField(max_length=255, blank=True, null=True, verbose_name='ID do Pagamento Externo')
+    url_pagamento = models.URLField(max_length=255, blank=True, null=True, verbose_name='URL do Pagamento')
     
     def __str__(self):
         return f"Pedido #{self.id} - {self.get_status_display()}"
+    
+    class Meta:
+        verbose_name = 'Pedido'
+        verbose_name_plural = 'Pedidos'
 
 class ItemPedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='itens', on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
     tamanho = models.ForeignKey(TamanhoProduto, on_delete=models.PROTECT)
     quantidade = models.PositiveIntegerField()
-    preco_unitario_congelado = models.DecimalField(max_digits=12, decimal_places=2)
+    preco_unitario_congelado = models.DecimalField(max_digits=12, decimal_places=2, verbose_name='Preço Unitário')
 
     def __str__(self):
         return f'{self.quantidade}x {self.produto.nome} no Pedido #{self.pedido.id}'
+    
+    class Meta:
+        verbose_name = 'Item do Pedido'
+        verbose_name_plural = 'Itens dos Pedidos'
 
 class ProdutoCarrinho(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
@@ -246,6 +329,10 @@ class ProdutoCarrinho(models.Model):
 
     class Meta:
         unique_together = ('produto', 'carrinho')
+        
+    class Meta:
+        verbose_name = 'Produto do Carrinho'
+        verbose_name_plural = 'Produtos dos Carrinhos'
 
 class ImagemProduto(models.Model):
     imagem = models.ForeignKey(Imagem, on_delete=models.CASCADE)
@@ -253,3 +340,7 @@ class ImagemProduto(models.Model):
 
     class Meta:
         unique_together = ('imagem', 'produto')
+    
+    class Meta:
+        verbose_name = 'Imagem do Produto'
+        verbose_name_plural = 'Imagens dos Produtos'
