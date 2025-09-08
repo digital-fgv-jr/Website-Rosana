@@ -1,4 +1,4 @@
-# Serializers v7.2.1
+# Serializers v7.4.1
 
 from datetime import date, timedelta
 from rest_framework import serializers
@@ -305,6 +305,15 @@ class CarrinhoSerializer(serializers.ModelSerializer):
             'produto_id', 'tamanho_id', 'quantidade',
         ]
     
+    def create(self, validated_data):
+        validated_data.pop('produto_id', None)
+        validated_data.pop('tamanho_id', None)
+        validated_data.pop('quantidade', None)
+        
+        carrinho = Carrinho.objects.create(**validated_data)
+        return carrinho
+
+
     def get_total_itens(self, obj):
         return sum(item.quantidade for item in obj.produtocarrinho_set.all())
 
@@ -329,20 +338,22 @@ class CarrinhoSerializer(serializers.ModelSerializer):
         except (Produto.DoesNotExist, TamanhoProduto.DoesNotExist):
             raise serializers.ValidationError("Produto ou tamanho inválido.")
 
-        item, created = ProdutoCarrinho.objects.get_or_create(
+        if quantidade == 0:
+            ProdutoCarrinho.objects.filter(
+                carrinho=instance, produto=produto, tamanho=tamanho
+            ).delete()
+            return instance
+
+        if quantidade > produto.qtd_disponivel:
+            raise serializers.ValidationError(f"Estoque insuficiente. Apenas {produto.qtd_disponivel} unidades disponíveis.")
+        
+        item, created = ProdutoCarrinho.objects.update_or_create(
             carrinho=instance,
             produto=produto,
-            tamanho=tamanho
+            tamanho=tamanho,
+            defaults={'quantidade': quantidade}
         )
-
-        if quantidade > 0:
-            if quantidade > produto.qtd_disponivel:
-                raise serializers.ValidationError(f"Estoque insuficiente. Apenas {produto.qtd_disponivel} unidades disponíveis.")
-            item.quantidade = quantidade
-            item.save()
-        else:
-            item.delete()
-
+        
         return instance
 
 """
@@ -516,6 +527,7 @@ class ListaProdutosCategoriaSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'nome_categoria',
+            'produtos',
         ]
 
 
