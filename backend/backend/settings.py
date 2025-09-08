@@ -14,7 +14,12 @@ PSQL_USER= str(os.environ.get('PSQL_USER'))
 PSQL_PASSWORD= str(os.environ.get('PSQL_PASSWORD'))
 PSQL_HOST= str(os.environ.get('PSQL_HOST'))
 PSQL_PORT= str(os.environ.get('PSQL_PORT'))
-
+# Mercado pago
+MERCADOPAGO_ACCESS_TOKEN=str(os.environ.get('MERCADOPAGO_ACCESS_TOKEN'))
+# Frenet
+FRENET_API_KEY=str(os.environ.get('FRENET_API_KEY'))
+# Cep fisico do ecomerce
+MEU_CEP_ORIGEM=str(os.environ.get('MEU_CEP_ORIGEM'))
 
 ALLOWED_HOSTS = []
 
