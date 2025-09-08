@@ -1,4 +1,4 @@
-# Serializers v7.1.9
+# Serializers v7.2.1
 
 from datetime import date, timedelta
 from rest_framework import serializers
@@ -42,7 +42,6 @@ class ContatoLojaInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContatoLoja
         fields = [
-            'id',
             'contato',
             'whatsapp',
             'telefone',
@@ -67,7 +66,7 @@ class ContatoDeLojaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContatoDeLoja
         fields = [
-            'id'
+            'id',
             'nome',
             'sobrenome',
             'cpf',
@@ -518,3 +517,5 @@ class ListaProdutosCategoriaSerializer(serializers.ModelSerializer):
             'id',
             'nome_categoria',
         ]
+
+
