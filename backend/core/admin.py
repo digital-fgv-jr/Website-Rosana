@@ -1,9 +1,8 @@
-# Admin 8.0.0
+# Admin v8.1.3
 
 from django.contrib import admin
 from django.utils.html import format_html
-from django.urls import reverse
-from django.http import HttpResponseRedirect
+
 from .models import (
     Endereco, Contato, ContatoLoja, ContatoNormal, ContatoDeLoja,
     InformacoesEntrega, Loja, Categoria, Produto, DetalheProduto, 
@@ -20,7 +19,7 @@ class Enderecos(admin.ModelAdmin):
 
     class Media:
         js = (
-            'core/js/cep_mask.js', 
+            'core/js/cep_mask.js',
         )
 
 class ContatoLojaInline(admin.StackedInline):
@@ -35,6 +34,11 @@ class ContatoNormais(admin.ModelAdmin):
     search_fields = ('nome', 'sobrenome', 'cpf', 'email')
     def get_queryset(self, request):
         return super().get_queryset(request).filter(contatoloja__isnull=True)
+    
+    class Media:
+        js = (
+            'core/js/contato_masks.js', 
+        )
 
 @admin.register(ContatoDeLoja)
 class ContatoDeLojas(admin.ModelAdmin):
@@ -43,6 +47,11 @@ class ContatoDeLojas(admin.ModelAdmin):
     inlines = [ContatoLojaInline]
     def get_queryset(self, request):
         return super().get_queryset(request).filter(contatoloja__isnull=False)
+    
+    class Media:
+        js = (
+            'core/js/contato_masks.js', 
+        )
 
 @admin.register(Imagem)
 class Imagens(admin.ModelAdmin):
@@ -126,7 +135,7 @@ class ItemPedidoInline(admin.TabularInline):
         return f"R$ {resultado:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
     
 @admin.register(Pedido)
-class PedidosAdmin(admin.ModelAdmin):
+class Pedidos(admin.ModelAdmin):
     list_display = ('id', 'contato_cliente', 'status', 'data_hora_criacao', 'valor_total_do_pedido')
     list_filter = ('status',)
     search_fields = ('id', 'contato_cliente__nome', 'contato_cliente__cpf')

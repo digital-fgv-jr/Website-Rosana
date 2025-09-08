@@ -41,16 +41,19 @@ window.addEventListener('DOMContentLoaded', (event) => {
     };
     
     const applyMask = (selector, maskFunction) => {
-        const input = document.querySelector(selector);
-        if (input) {
-            input.addEventListener('input', (e) => {
-                e.target.value = maskFunction(e.target.value);
-            });
-        }
-    };    
+        const inputs = document.querySelectorAll(selector);
+        inputs.forEach(input => {
+            if (input) {
+                input.addEventListener('input', (e) => {
+                    e.target.value = maskFunction(e.target.value);
+                });
+            }
+        });
+    }; 
 
     applyMask('input[name$="-whatsapp"]', maskPhone);
     applyMask('input[name$="-telefone"]', maskPhone);
     applyMask('input[name$="-cnpj"]', maskCnpj);
-    applyMask('#id_cpf', maskCpf);
-    applyMask('input[name$="-instagram"]', maskInstagram);});
+    applyMask('input[name$="cpf"]', maskCpf);
+    applyMask('input[name$="-instagram"]', maskInstagram);
+});
