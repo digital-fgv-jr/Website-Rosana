@@ -1,4 +1,4 @@
-# Database v10.0.9
+# Database v10.1.0
 
 from django.db import models
 from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
@@ -96,14 +96,14 @@ class Contato(models.Model):
 class ContatoLoja(models.Model):
     contato = models.OneToOneField(Contato, on_delete=models.CASCADE, primary_key=True, verbose_name='Contato da Loja')
     whatsapp = models.CharField(
-        max_length=14,                        
+        max_length=15,                        
         validators=[
             MinLengthValidator(13),
             ], 
         verbose_name='WhatsApp'
         )
     telefone = models.CharField(
-        max_length=14,                        
+        max_length=15,
         validators=[
             MinLengthValidator(13),
             ],
