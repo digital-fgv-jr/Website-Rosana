@@ -1,4 +1,4 @@
-# Admin 12.3.2
+# Admin v12.4.1
 
 from django.contrib import admin
 from django.utils.html import format_html
@@ -26,7 +26,7 @@ class Enderecos(admin.ModelAdmin):
     @admin.display(description='Endereço')
     def get_endereco_completo(self, obj):
         return f'{obj.logradouro}, {obj.numero}. {obj.bairro}, {obj.cidade} - {obj.uf}'
-    
+
 class ContatoLojaInline(admin.StackedInline):
     model = ContatoLoja
     can_delete = False
@@ -95,7 +95,7 @@ class Imagens(admin.ModelAdmin):
 @admin.register(InformacoesEntrega)
 class InformacoesEntregas(admin.ModelAdmin):
     list_display = ('rastreador', 'transportadora', 'preco_frete', 'data_hora_finalizado',)
-    readonly_fields = ('rastreador', 'transportadora', 'preco_frete', 'entrega_estimada', 'data_hora_finalizado',)
+    readonly_fields = ('data_hora_finalizado',)
     list_display_links = ('rastreador', 'transportadora', 'preco_frete', 'data_hora_finalizado',)
     list_per_page = 20
 
