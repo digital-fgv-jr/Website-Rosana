@@ -4,12 +4,11 @@ import DropdownSection from "../components/DropdownSection";
 
 export default function SobreNos() {
     return (
-      <div>
+      <div className ="bg-[#faf9f6]">
           <Header />
-          <h1>Sobre nós</h1>
           
-          {/* Título e subtítulo */}
-      <section className="text-center py-12 bg-gray-50">
+          {/* Títulos e subtítulo */}
+      <section className="text-center py-12">
         <h1 className="text-4xl font-bold mb-4">Sobre Nós</h1>
         <p className="text-lg text-gray-700">
           Conheça a história e a essência da RoAlves Joalheria
@@ -29,7 +28,7 @@ export default function SobreNos() {
           <img 
             src="blocoimg1.jpg" 
             alt="Missão" 
-            className="w-full h-auto rounded shadow-md"
+            className="w-full h-auto"
           />
         </div>
       </section>
@@ -47,7 +46,7 @@ export default function SobreNos() {
           <img 
             src="blocoimg2.jpg" 
             alt="História" 
-            className="w-full h-auto rounded shadow-md"
+            className="w-full h-auto"
           />
         </div>
         </section>

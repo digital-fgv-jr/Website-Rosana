@@ -87,7 +87,14 @@ button:focus-visible {
 }
 @font-face {
   font-family: 'Montserrat';
-  src: url('./assets/fonts/Montserrat-Regular.otf') format('otf');
+  src: url('./assets/fonts/Montserrat-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'BodoniMT';
+  src: url('./assets/fonts/Bodoni-MT.woff') format('woff');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
