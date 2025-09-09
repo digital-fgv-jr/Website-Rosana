@@ -7,6 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        BodoniMT: ['BodoniMT', 'cursive'],
         MontserratRegular: ['Montserrat', 'cursive'],
         RoxboroughCFRegular: ['RoxboroughCF', 'cursive'],
         RoxboroughCFBold: ['RoxboroughCF', 'cursive'],
