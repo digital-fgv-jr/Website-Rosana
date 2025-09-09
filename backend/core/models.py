@@ -1,26 +1,21 @@
-# Database v13.1.0
-"""
-# ██╗     
-# ██║     
-# ██║     
-# ██║     
-# ██║     
-# ███████╗
-# ╚══════╝
-# """
-
+# Database v14.3.2
 import uuid
-import os
 from io import BytesIO
 from PIL import Image as PILImage
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
-from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
 
+from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
 from .utils.validations import CPFValidator
 
-class InformacoesEntrega(models.Model):
+class BaseModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    class Meta:
+        abstract = True
+
+class InformacoesEntrega(BaseModel):
     entrega_estimada = models.DateField()
     rastreador = models.CharField(max_length=32)
     transportadora = models.CharField(max_length=32)
@@ -41,7 +36,7 @@ class InformacoesEntrega(models.Model):
         verbose_name = 'Informações da Entrega'
         verbose_name_plural = 'Informações das Entregas'
 
-class Loja(models.Model):
+class Loja(BaseModel):
     apelido = models.CharField(max_length=32, verbose_name='Apelido da Loja')
 
     def __str__(self):
@@ -51,7 +46,7 @@ class Loja(models.Model):
         verbose_name = 'Loja'
         verbose_name_plural = 'Lojas'
 
-class Endereco(models.Model):
+class Endereco(BaseModel):
     UF = (
         ('AC', 'Acre'),
         ('AL', 'Alagoas'),
@@ -118,7 +113,7 @@ class Endereco(models.Model):
         verbose_name = 'Endereço'
         verbose_name_plural = 'Endereços'
 
-class Contato(models.Model):
+class Contato(BaseModel):
     nome = models.CharField(max_length=64, blank=False, null=False)
     sobrenome = models.CharField(max_length=128)
     cpf = models.CharField(
@@ -185,7 +180,7 @@ class ContatoDeLoja(Contato):
         verbose_name = 'Contato (Loja)'
         verbose_name_plural = 'Contatos (Lojas)'
 
-class Categoria(models.Model):
+class Categoria(BaseModel):
     loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
     nome_categoria = models.CharField(max_length=64, verbose_name='Nome da Categoria')
 
@@ -196,7 +191,7 @@ class Categoria(models.Model):
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
 
-class Produto(models.Model):
+class Produto(BaseModel):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     nome = models.CharField(max_length=128)
     descricao = models.TextField(verbose_name='Descrição')
@@ -230,6 +225,7 @@ class Produto(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0)]
     )
+    dias_para_disponibilizar = models.PositiveIntegerField(default=0, verbose_name='Dias para Disponibilizar para Entrega')
 
     class Meta:
         indexes = [
@@ -241,7 +237,7 @@ class Produto(models.Model):
     def __str__(self):
         return f'{self.nome}'
 
-class DetalheProduto(models.Model):
+class DetalheProduto(BaseModel):
     propriedade = models.CharField(max_length=64)
     descricao = models.TextField(max_length=128, verbose_name='Descrição')
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
@@ -253,7 +249,7 @@ class DetalheProduto(models.Model):
         verbose_name = 'Detalhe do Produto'
         verbose_name_plural = 'Detalhes dos Produtos'
 
-class Tamanho(models.Model):
+class Tamanho(BaseModel):
     nome = models.CharField(max_length=32)
     valor = models.CharField(max_length=2)
 
@@ -264,7 +260,7 @@ class Tamanho(models.Model):
         verbose_name = 'Tamanho'
         verbose_name_plural = 'Tamanhos'
 
-class TamanhoProduto(models.Model):
+class TamanhoProduto(BaseModel):
     tamanho = models.ForeignKey(Tamanho, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
 
@@ -273,12 +269,13 @@ class TamanhoProduto(models.Model):
         verbose_name = 'Tamanho do Produto'
         verbose_name_plural = 'Tamanhos dos Produtos'
 
-class Pedido(models.Model):
+class Pedido(BaseModel):
     STATUS = (
-        ('C', 'Concluída'),
-        ('P', 'Pendente'),
         ('A', 'Aguardando Pagamento'),
         ('R', 'Recusada'),
+        ('E', 'Em Preparo'),
+        ('S', 'Enviada'),
+        ('C', 'Concluída'),
     )
     contato_cliente = models.ForeignKey(Contato, on_delete=models.PROTECT, verbose_name='Contado do Cliente')
     endereco_entrega = models.ForeignKey(Endereco, on_delete=models.PROTECT, verbose_name='Endereço de Entrega')
@@ -297,7 +294,7 @@ class Pedido(models.Model):
         verbose_name = 'Pedido'
         verbose_name_plural = 'Pedidos'
 
-class ItemPedido(models.Model):
+class ItemPedido(BaseModel):
     pedido = models.ForeignKey(Pedido, related_name='itens', on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.PROTECT)
     tamanho = models.ForeignKey(TamanhoProduto, on_delete=models.PROTECT)
@@ -311,7 +308,7 @@ class ItemPedido(models.Model):
         verbose_name = 'Item do Pedido'
         verbose_name_plural = 'Itens dos Pedidos'
 
-class Imagem(models.Model):
+class Imagem(BaseModel):
     titulo = models.CharField(max_length=128, blank=True, verbose_name='Título')
     imagem = models.ImageField(upload_to='images/')
     
@@ -357,7 +354,7 @@ class Imagem(models.Model):
                 default_storage.delete(self.imagem.name)
         super().delete(*args, **kwargs)
 
-class ImagemProduto(models.Model):
+class ImagemProduto(BaseModel):
     imagem = models.ForeignKey(Imagem, on_delete=models.CASCADE)
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
 

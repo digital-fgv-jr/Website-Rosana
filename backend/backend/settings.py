@@ -20,8 +20,12 @@ MERCADOPAGO_ACCESS_TOKEN=str(os.environ.get('MERCADOPAGO_ACCESS_TOKEN'))
 FRENET_API_KEY=str(os.environ.get('FRENET_API_KEY'))
 # Cep fisico do ecomerce
 MEU_CEP_ORIGEM=str(os.environ.get('MEU_CEP_ORIGEM'))
+# Back-end API KEY
+API_KEY=str(os.environ.get('API_KEY'))
 
 ALLOWED_HOSTS = []
+
+BASE_URL = '127.0.0.1:8000'
 
 
 # Application definition
@@ -39,12 +43,19 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'core.permissions.HasAPIKey',
+    ]
+}
+
 JAZZMIN_SETTINGS = {
     "site_title": "Rô Jewellery Admin",
     "site_header": "Rô Jewellery Admin",
     "site_brand": "Rô Jewellery Admin",
     "site_logo": "core/img/logo.png",
     "welcome_sign": "Bem-vindo à Minha Loja",
+    'login_logo': "core/img/logo_nobg.png",
     "custom_css": "core/css/admin_extra.css",
 }
 
@@ -82,9 +93,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -96,9 +104,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -116,9 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'America/Sao_Paulo'
@@ -128,10 +130,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
