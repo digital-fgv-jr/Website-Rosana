@@ -1,0 +1,7 @@
+.login-logo img {
+    max-height: 200px !important;
+    max-width: 300px !important;
+    width: auto !important;
+    height: auto !important;
+    margin-bottom: 30px !important;
+}
