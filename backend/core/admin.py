@@ -1,4 +1,4 @@
-# Admin v12.3.1
+# Admin 12.3.2
 
 from django.contrib import admin
 from django.utils.html import format_html
@@ -195,6 +195,7 @@ class Categorias(admin.ModelAdmin):
     def get_categoria(self, obj):
         return obj.nome_categoria
 
+## FINALIZADO ##
 @admin.register(Tamanho)
 class Tamanhos(admin.ModelAdmin):
     list_display = ('nome', 'valor')
@@ -222,6 +223,7 @@ class TamanhoProdutoInline(admin.TabularInline):
     autocomplete_fields = ('tamanho',)
     extra = 1
 
+## FINALIZADO ##
 @admin.register(Produto)
 class Produtos(admin.ModelAdmin):
     list_display = ('id', 'nome', 'categoria', 'preco', 'preview_da_imagem_lista')

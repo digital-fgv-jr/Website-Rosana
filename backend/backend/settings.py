@@ -27,6 +27,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,9 +35,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'core.apps.CoreConfig',
+    'core',
     'rest_framework',
 ]
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Rô Jewellery Admin",
+    "site_header": "Rô Jewellery Admin",
+    "site_brand": "Rô Jewellery Admin",
+    "site_logo": "core/img/logo.png",
+    "welcome_sign": "Bem-vindo à Minha Loja",
+    "custom_css": "core/css/admin_extra.css",
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
