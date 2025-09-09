@@ -1,4 +1,4 @@
-# Serializers v7.4.1
+# Serializers v9.0.0
 
 from datetime import date, timedelta
 from rest_framework import serializers
@@ -6,8 +6,8 @@ from django.db import transaction
 from .models import (
     Endereco, Contato, ContatoLoja, ContatoNormal, ContatoDeLoja,
     InformacoesEntrega, Loja, Categoria, Produto, DetalheProduto, 
-    Imagem, Tamanho, TamanhoProduto, Carrinho, Pedido, 
-    ItemPedido, ProdutoCarrinho, ImagemProduto
+    Imagem, Tamanho, TamanhoProduto, Pedido, 
+    ItemPedido, ImagemProduto
 )
 import requests
 import mercadopago
@@ -256,106 +256,6 @@ class ProdutoSerializer(serializers.ModelSerializer):
             
         return produto
 
-class ProdutoCarrinhoLiteSerializer(serializers.ModelSerializer):
-    imagem_principal_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Produto
-        fields = [
-            'id', 
-            'nome', 
-            'preco', 
-            'imagem_principal_url'
-        ]
-
-    def get_imagem_principal_url(self, obj):
-        imagem_produto = obj.imagemproduto_set.first()
-        if imagem_produto and imagem_produto.imagem:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(imagem_produto.imagem.imagem.url)
-        return None
-
-class ProdutoCarrinhoSerializer(serializers.ModelSerializer):
-    produto = ProdutoCarrinhoLiteSerializer(read_only=True)
-    tamanho = TamanhoProdutoSerializer(read_only=True)
-
-    class Meta:
-        model = ProdutoCarrinho
-        fields = [
-            'id', 
-            'produto', 
-            'tamanho', 
-            'quantidade'
-        ]
-
-class CarrinhoSerializer(serializers.ModelSerializer):
-    itens = ProdutoCarrinhoSerializer(many=True, read_only=True, source='produtocarrinho_set')
-    subtotal = serializers.SerializerMethodField()
-    total_itens = serializers.SerializerMethodField()
-
-    produto_id = serializers.IntegerField(write_only=True, required=False)
-    tamanho_id = serializers.IntegerField(write_only=True, required=False)
-    quantidade = serializers.IntegerField(write_only=True, required=False, min_value=0)
-
-    class Meta:
-        model = Carrinho
-        fields = [
-            'id', 'fechado', 'total_itens', 'subtotal', 'itens',
-            'produto_id', 'tamanho_id', 'quantidade',
-        ]
-    
-    def create(self, validated_data):
-        validated_data.pop('produto_id', None)
-        validated_data.pop('tamanho_id', None)
-        validated_data.pop('quantidade', None)
-        
-        carrinho = Carrinho.objects.create(**validated_data)
-        return carrinho
-
-
-    def get_total_itens(self, obj):
-        return sum(item.quantidade for item in obj.produtocarrinho_set.all())
-
-    def get_subtotal(self, obj):
-        subtotal = sum(item.quantidade * item.produto.preco for item in obj.produtocarrinho_set.all())
-        return f"{subtotal:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-
-    def update(self, instance, validated_data):
-        produto_id = validated_data.get('produto_id')
-        tamanho_id = validated_data.get('tamanho_id')
-        quantidade = validated_data.get('quantidade')
-
-        if instance.fechado:
-            raise serializers.ValidationError("Não é possível modificar um carrinho fechado.")
-        
-        if not all([produto_id, tamanho_id, quantidade is not None]):
-            raise serializers.ValidationError("Para modificar um item, 'produto_id', 'tamanho_id' e 'quantidade' são necessários.")
-
-        try:
-            produto = Produto.objects.get(id=produto_id)
-            tamanho = TamanhoProduto.objects.get(id=tamanho_id, produto=produto)
-        except (Produto.DoesNotExist, TamanhoProduto.DoesNotExist):
-            raise serializers.ValidationError("Produto ou tamanho inválido.")
-
-        if quantidade == 0:
-            ProdutoCarrinho.objects.filter(
-                carrinho=instance, produto=produto, tamanho=tamanho
-            ).delete()
-            return instance
-
-        if quantidade > produto.qtd_disponivel:
-            raise serializers.ValidationError(f"Estoque insuficiente. Apenas {produto.qtd_disponivel} unidades disponíveis.")
-        
-        item, created = ProdutoCarrinho.objects.update_or_create(
-            carrinho=instance,
-            produto=produto,
-            tamanho=tamanho,
-            defaults={'quantidade': quantidade}
-        )
-        
-        return instance
-
 """
 
 class ItemPedidoSerializer(serializers.ModelSerializer):
@@ -529,5 +429,3 @@ class ListaProdutosCategoriaSerializer(serializers.ModelSerializer):
             'nome_categoria',
             'produtos',
         ]
-
-

@@ -1,12 +1,12 @@
-# Views v2.1.0
+# Views v3.1.0
 
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Loja, Categoria, Produto, Carrinho, Pedido
+from .models import Loja, Categoria, Produto, Pedido
 from .serializers import (
     LojaSerializer, ListaCategoriasLojaSerializer, ProdutoSerializer,
-    ListaProdutosCategoriaSerializer, CarrinhoSerializer, #PedidoSerializer
+    ListaProdutosCategoriaSerializer, #PedidoSerializer
 )
 
 class LojaViewSet(viewsets.ReadOnlyModelViewSet):
@@ -43,19 +43,6 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProdutoSerializer
     permission_classes = [permissions.AllowAny]
 
-class CarrinhoViewSet(mixins.CreateModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      viewsets.GenericViewSet):
-    """
-    - POST /api/carrinhos/ -> Cria um novo carrinho.
-    - GET /api/carrinhos/{id}/ -> Vê o conteúdo do carrinho.
-    - PATCH /api/carrinhos/{id}/ -> Adiciona/atualiza/remove um item do carrinho.
-    """
-    queryset = Carrinho.objects.all()
-    serializer_class = CarrinhoSerializer
-    permission_classes = [permissions.AllowAny]
-
 '''
 class PedidoViewSet(mixins.CreateModelMixin,
                     mixins.RetrieveModelMixin,
@@ -73,3 +60,4 @@ class PedidoViewSet(mixins.CreateModelMixin,
     def get_serializer_context(self):
         return {'request': self.request}
 '''
+
