@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import DropdownSection from "../components/DropdownSection";
 import MiniCarrinho from "../components/MiniCarrinho";
 import { produtos } from "../data/produtos";
 import ProdutosRelacionados from "../components/ProdutosRelacionados";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import HeaderCompact from "../components/HeaderCompact";
+import Footer from "../components/Footer";
+import PreFooter from "../components/PreFooter";
+import WhatsApp from "../components/Atoms/WhatsApp";
 
 export default function Produto() {
 
@@ -78,7 +80,12 @@ export default function Produto() {
 
   return (
     <div className="min-h-screen flex flex-col bg-brancoperola">
-      <Header />
+      <Header/>     
+
+      {/* SENTINELA: é ele que dispara a aparição do header compacto */}
+      <div id="header-sentinel" style={{ position: 'absolute', top: 0, height: 0, margin: 0, padding: 0 }} />
+
+      <HeaderCompact />
 
       <main className="flex-grow bg-brancoperola py-12 px-6">
         <div className="flex justify-center w-full">
@@ -193,10 +200,13 @@ export default function Produto() {
             }}
           />
         )}
+      
       <ProdutosRelacionados 
         produtos={produtos.filter(p => p.categoria.nome_categoria === produto.categoria.nome_categoria && p.id !== produto.id)}
       />
-      <DropdownSection />
+
+      <WhatsApp />
+      <PreFooter />
       <Footer />
     </div>
   );
