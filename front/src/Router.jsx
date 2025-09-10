@@ -7,7 +7,11 @@ import Eventos from "./pages/eventos";
 import SobreNos from "./pages/sobrenos";
 import Produto from "./pages/produto";
 import Carrinho from "./pages/carrinho";
+import Contato from "./pages/contato";
 import MiniCarrinho from "./components/MiniCarrinho";
+import Checkout from "./pages/checkout";
+import PagamentoStatus from "./pages/pagamentoStatus";
+
 
 function AppRouter() {
   return (
@@ -21,6 +25,9 @@ function AppRouter() {
           <Route path="/sobre-nos" element={<SobreNos />} />
           <Route path="/produto/:id" element={<Produto />} />
           <Route path="/carrinho/" element={<Carrinho />}/>
+          <Route path="/contato/" element={<Contato />}/>
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/pagamento/status" element={<PagamentoStatus />} />
         </Routes>     
     </Router>
   );

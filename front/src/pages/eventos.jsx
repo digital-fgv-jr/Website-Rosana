@@ -33,13 +33,13 @@ export default function Eventos() {
             <h2 className="text-4xl font-BodoniMT text-[#1c2c3c] mb-10">
               Participar de um evento é sempre mais do que expor joias
             </h2>
-            <p className=" text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed">
+            <p className=" text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed text-justify">
               Cada peça que levamos carrega consigo a essência do nosso trabalho: o afeto, a memória e a identidade. Quando essas criações encontram pessoas, nascem novas conexões, novos significados e novas possibilidades de personalização.
             </p>
-            <p className=" text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4">
+            <p className=" text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4 text-justify">
               Nossos eventos são espaços de troca. É ali que conversamos, ouvimos histórias e descobrimos inspirações que muitas vezes se transformam em joias únicas. O brilho nos olhos de quem encontra uma peça que traduz exatamente um sentimento é o que nos move a continuar criando.
             </p>
-            <p className=" text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4">
+            <p className=" text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4 text-justify">
               Feiras, exposições e encontros coletivos nos permitem compartilhar a força do trabalho artesanal. São ocasiões em que celebramos a beleza do feito à mão, mostrando que cada detalhe é pensado com cuidado, sem pressa e sem fórmulas prontas. Em um mundo acelerado, nossos eventos são convites para desacelerar e valorizar o que é único.
             </p>
           </div>
@@ -58,13 +58,13 @@ export default function Eventos() {
             <h2 className="text-4xl font-BodoniMT text-[#1c2c3c] mb-10">
               Mais do que mostrar nossas joias, queremos apresentar nossa essência
             </h2>
-            <p className="text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed">
+            <p className="text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed text-justify">
               Quem visita um evento nosso não encontra apenas uma coleção, mas um universo de significados: peças que podem ser adaptadas, personalizadas ou criadas a partir de uma memória pessoal. Cada conversa pode se tornar o ponto de partida para uma nova história em ouro e prata.
             </p>
-            <p className="text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4">
+            <p className="text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4 text-justify">
               Também acreditamos que os eventos têm um papel de aproximação. É ali que clientes se tornam amigos, que ideias ganham forma e que o afeto encontra espaço para ser celebrado. São encontros que nos permitem crescer não apenas como marca, mas como parte de uma comunidade que valoriza o artesanal, o autoral e o verdadeiro.
             </p>
-            <p className="text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4">
+            <p className="text-[#1c2c3c] font-MontserratRegular text-[130%] leading-relaxed mt-4 text-justify">
               Porque, no fim, cada evento é uma celebração da vida. Uma oportunidade de transformar lembranças em joias, encontros em inspirações e instantes em eternidade. E é por isso que cada participação nossa carrega o mesmo propósito: emocionar, conectar e eternizar histórias.
             </p>
           </div>

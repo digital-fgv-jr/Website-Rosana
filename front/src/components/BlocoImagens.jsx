@@ -36,7 +36,9 @@ export default function ThreeImagesSection() {
           <p className="text-base md:text-lg font-MontserratRegular text-[#1c2c3c] mb-4">
             Cada peça é criada para você, com cuidado e atenção aos detalhes.
           </p>
-          <button className="px-6 py-3 bg-[#1c2c3c] text-[#faf9f6] font-MontserratRegular rounded-lg hover:bg-[#25384d] transition">
+          <button className="px-6 py-3 bg-[#1c2c3c] text-[#faf9f6] font-MontserratRegular rounded-lg hover:bg-[#25384d] transition"
+          onClick={() => (window.location.href = "/contato")}
+          >
             Entre em Contato
           </button>
         </div>

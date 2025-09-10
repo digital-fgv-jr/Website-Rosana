@@ -29,9 +29,9 @@ export default function SobreNos() {
             <div className="lg:w-1/2">
               <h2 className="text-4xl font-BodoniMT text-[#1c2c3c] mb-10">Nossa 
                 <span className="text-[#c2b280]"> Missão</span></h2>
-              <p className="text-gray-700 text-xl font-MontserratRegular leading-relaxed">
+              <p className="text-gray-700 text-xl font-MontserratRegular leading-relaxed text-justify">
                 Nossa história nasceu de um sonho antigo: transformar a paixão por joias artesanais em um espaço onde cada criação carrega memórias, afetos e identidade. Depois de anos de dedicação ao ofício, percebemos que o que realmente dá valor a uma joia não é apenas o material, mas a história que ela tem a contar.
-                Trabalhamos com produção autoral e artesanal, em pequena escala, porque acreditamos que o verdadeiro luxo está na singularidade. Cada peça é criada com cuidado, unindo tradição e modernidade, para refletir a essência de quem a recebe. Aqui, não existem coleções padronizadas: cada detalhe pode ser adaptado para traduzir sentimentos únicos.
+                Trabalhamos com produção autoral e artesanal, em pequena escala, porque acreditamos que o verdadeiro luxo está na singularidade. Cada peça é criada com cuidado, unindo tradição e modernidade, para refletir a essência de quem a recebe. Aqui, não existem coleções padronizadas: Cada detalhe pode ser adaptado para traduzir sentimentos únicos.
               </p>
             </div>
             <div className="lg:w-1/2">
@@ -49,10 +49,10 @@ export default function SobreNos() {
               <h2 className="text-4xl font-BodoniMT text-[#1c2c3c] mb-10">Nossa 
                 <span className="text-[#c2b280]"> História</span>
               </h2>
-              <p className="text-gray-700 text-xl font-MontserratRegular leading-relaxed">
+              <p className="text-gray-700 text-xl font-MontserratRegular leading-relaxed text-justify">
                 Nosso propósito é criar joias que vão além da estética. São símbolos de conquistas, celebrações, memórias familiares e momentos inesquecíveis. Queremos que cada cliente se veja em sua joia, que encontre nela uma extensão de sua própria história.
               </p>
-              <p className="text-gray-700 text-xl font-MontserratRegular leading-relaxed mt-4">
+              <p className="text-gray-700 text-xl font-MontserratRegular leading-relaxed mt-4 text-justify">
                 Mais do que uma marca, somos um ateliê de significados. Um espaço onde o brilho do ouro e da prata se mistura com a beleza das lembranças, transformando emoções em peças que duram para sempre. Porque acreditamos que cada vida merece ser celebrada — e cada história, eternizada.
               </p>
             </div>
