@@ -3,32 +3,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ## Loading Environment Variables
 import os
-from dotenv import load_dotenv
 import ast
-load_dotenv(os.path.join(BASE_DIR, '.env'))
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = ast.literal_eval(os.environ.get('DEBUG')) == True
-# PSQL
-PSQL_NAME= str(os.environ.get('PSQL_NAME'))
-PSQL_USER= str(os.environ.get('PSQL_USER'))
-PSQL_PASSWORD= str(os.environ.get('PSQL_PASSWORD'))
-PSQL_HOST= str(os.environ.get('PSQL_HOST'))
-PSQL_PORT= str(os.environ.get('PSQL_PORT'))
-# Mercado pago
-MERCADOPAGO_ACCESS_TOKEN=str(os.environ.get('MERCADOPAGO_ACCESS_TOKEN'))
-# Frenet
-FRENET_API_KEY=str(os.environ.get('FRENET_API_KEY'))
-# Cep fisico do ecomerce
-MEU_CEP_ORIGEM=str(os.environ.get('MEU_CEP_ORIGEM'))
-# Back-end API KEY
-API_KEY=str(os.environ.get('API_KEY'))
 
-ALLOWED_HOSTS = []
+# Django
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False')) == True
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+
+# Chaves de API
+API_KEY = os.getenv('API_KEY')
+MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN')
+FRENET_API_KEY = os.getenv('FRENET_API_KEY')
+
+# PSQL
+POSTGRES_DB = os.getenv('POSTGRES_DB')
+POSTGRES_USER = os.getenv('POSTGRES_USER')
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+POSTGRES_HOST = os.getenv('POSTGRES_HOST')
+POSTGRES_PORT = os.getenv('POSTGRES_PORT')
 
 BASE_URL = '127.0.0.1:8000'
 
 
-# Application definition
+## Application definition
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -96,11 +93,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': PSQL_NAME,
-        'USER': PSQL_USER,
-        'PASSWORD': PSQL_PASSWORD,
-        'HOST': PSQL_HOST,
-        'PORT': PSQL_PORT,
+        'NAME': POSTGRES_DB,
+        'USER': POSTGRES_USER,
+        'PASSWORD': POSTGRES_PASSWORD,
+        'HOST': POSTGRES_HOST,
+        'PORT': POSTGRES_PORT,
     }
 }
 
