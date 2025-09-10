@@ -6,8 +6,6 @@ import CriadasParaVoce from "./pages/criadasparavoce";
 import Eventos from "./pages/eventos";
 import SobreNos from "./pages/sobrenos";
 import Produto from "./pages/produto";
-import Carrinho from "./pages/carrinho";
-import MiniCarrinho from "./components/MiniCarrinho";
 
 function AppRouter() {
   return (
@@ -20,7 +18,6 @@ function AppRouter() {
           <Route path="/eventos" element={<Eventos />} />
           <Route path="/sobre-nos" element={<SobreNos />} />
           <Route path="/produto/:id" element={<Produto />} />
-          <Route path="/carrinho/" element={<Carrinho />}/>
         </Routes>     
     </Router>
   );

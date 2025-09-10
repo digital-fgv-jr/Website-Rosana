@@ -1,5 +1,9 @@
-export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho}) {
+import { useNavigate } from "react-router-dom";
+import irParaCarrinho from "../pages/produto"
+
+export default function MiniCarrinho({ carrinho, fechar}) {
   
+  const navigate = useNavigate();
 
   if (!carrinho.length) return null;
 

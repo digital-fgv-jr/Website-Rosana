@@ -6,23 +6,29 @@ import DropdownSection from "../components/DropdownSection";
 import MiniCarrinho from "../components/MiniCarrinho";
 import { produtos } from "../data/produtos";
 import ProdutosRelacionados from "../components/ProdutosRelacionados";
-import { useNavigate } from "react-router-dom";
 
 export default function Produto() {
-
-
-  const navigate = useNavigate();
   const { id } = useParams();
   const produto = produtos.find((p) => p.id === parseInt(id));
 
   const [quantidade, setQuantidade] = useState(1);
+  
   const [carrinho, setCarrinho] = useState(() => {
   const dados = localStorage.getItem("carrinho");
   return dados ? JSON.parse(dados) : [];
   });
 
+  useEffect(() => {
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  }, [carrinho]);
+
   const [abrirMiniCarrinho, setAbrirMiniCarrinho] = useState(false);
 
+  const limparCarrinho = () => {
+  localStorage.removeItem("carrinho");
+  setCarrinho([]);
+  setAbrirMiniCarrinho(false);
+  };
 
   useEffect(() => {
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
@@ -74,7 +80,6 @@ export default function Produto() {
     setCarrinho(carrinhoAtual);
     setAbrirMiniCarrinho(true);
   };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-brancoperola">
@@ -183,16 +188,13 @@ export default function Produto() {
         </div>
 
       {/* Mini carrinho popup */}
-        {abrirMiniCarrinho && (
-          <MiniCarrinho  
-          carrinho={carrinho}
-            fechar={() => setAbrirMiniCarrinho(false)}
-            irParaCarrinho={() => {
-              setAbrirMiniCarrinho(false); // fecha o popup
-              navigate("/carrinho");       // redireciona para a página de carrinho
-            }}
-          />
-        )}
+      {abrirMiniCarrinho && (
+      <MiniCarrinho
+        carrinho={carrinho}
+        fechar={() => setAbrirMiniCarrinho(false)}
+        limparCarrinho={limparCarrinho}
+      />
+      )}
       <ProdutosRelacionados 
         produtos={produtos.filter(p => p.categoria.nome_categoria === produto.categoria.nome_categoria && p.id !== produto.id)}
       />

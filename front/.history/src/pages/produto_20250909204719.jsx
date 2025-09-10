@@ -10,8 +10,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function Produto() {
 
-
-  const navigate = useNavigate();
   const { id } = useParams();
   const produto = produtos.find((p) => p.id === parseInt(id));
 
@@ -75,6 +73,8 @@ export default function Produto() {
     setAbrirMiniCarrinho(true);
   };
 
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex flex-col bg-brancoperola">

@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function Produto() {
 
-
   const navigate = useNavigate();
   const { id } = useParams();
   const produto = produtos.find((p) => p.id === parseInt(id));
@@ -74,7 +73,6 @@ export default function Produto() {
     setCarrinho(carrinhoAtual);
     setAbrirMiniCarrinho(true);
   };
-
 
   return (
     <div className="min-h-screen flex flex-col bg-brancoperola">
@@ -184,12 +182,12 @@ export default function Produto() {
 
       {/* Mini carrinho popup */}
         {abrirMiniCarrinho && (
-          <MiniCarrinho  
-          carrinho={carrinho}
+          <MiniCarrinho
+            carrinho={carrinho}
             fechar={() => setAbrirMiniCarrinho(false)}
             irParaCarrinho={() => {
               setAbrirMiniCarrinho(false); // fecha o popup
-              navigate("/carrinho");       // redireciona para a página de carrinho
+              navigate("/carrinho/");       // redireciona para a página de carrinho
             }}
           />
         )}
