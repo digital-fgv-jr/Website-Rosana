@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
+import HeaderCompact from "../components/HeaderCompact";
 import Footer from "../components/Footer";
 import { produtos } from "../data/produtos";
 
@@ -76,7 +77,13 @@ export default function Carrinho() {
 
   return (
     <div className="min-h-screen flex flex-col bg-brancoperola">
-      <Header />
+      <Header/>     
+
+      {/* SENTINELA: é ele que dispara a aparição do header compacto */}
+      <div id="header-sentinel" style={{ position: 'absolute', top: 0, height: 0, margin: 0, padding: 0 }} />
+
+      <HeaderCompact />
+
 
       <main className="flex-grow py-12 px-6 max-w-6xl mx-auto">
         <h1 className="text-3xl font-RoxboroughCFRegular text-gray-800 mb-8">

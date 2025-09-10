@@ -1,19 +1,19 @@
-/*import Header from "../components/Header/Header"
-import HeaderCompact from "../components/HeaderCompact/HeaderCompact";
-import PreFooter from "../components/PreFooter/PreFooter"
-import Footer from "../components/Footer/Footer";
-import WhatsApp from "../components/Atoms/WhatsApp/WhatsApp";*/
+import Header from "../components/Header"
+import HeaderCompact from "../components/HeaderCompact";
+import PreFooter from "../components/PreFooter"
+import Footer from "../components/Footer";
+import WhatsApp from "../components/Atoms/WhatsApp";
 
 export default function SobreNos() {
     return (
       <div className="bg-[#faf9f6]">
           
-          {/*<Header/>*/}         
-              
+          <Header/>   
+  
           {/* SENTINELA: é ele que dispara a aparição do header compacto */}
           <div id="header-sentinel" style={{ position: 'absolute', top: 0, height: 0, margin: 0, padding: 0 }} />
         
-          {/*<HeaderCompact />*/}
+          <HeaderCompact />
           
           {/* Títulos e subtítulo */}
           <section className="text-center py-5">
@@ -65,9 +65,9 @@ export default function SobreNos() {
             </div>
           </section>
 
-          {/*<WhatsApp />   
+          <WhatsApp />   
           <PreFooter />        
-          <Footer />*/}
+          <Footer />
       </div>
     )
 }

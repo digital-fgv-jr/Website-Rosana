@@ -1,11 +1,22 @@
-// src/components/Footer.jsx
+import styles from "./Footer.module.css";
+
 export default function Footer() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="w-full h-16 bg-[#faf9f6] flex items-center justify-center mt-4">
-      <p className="text-[#1c2c3c] font-medium">
-        © 2025 RoAlves Joalheria. Todos os direitos reservados.
-      </p>
+    <footer className={styles.root}>
+      <div className={styles.container}>
+        <img
+          src={"/logo-escura.svg"}
+          alt="Rosana Jewellery"
+          className={styles.logo}
+          loading="lazy"
+        />
+
+        <p className={styles.copyright}>
+          Copyright © {year} - Todos os direitos reservados. Desenvolvido pela FGV Jr.
+        </p>
+      </div>
     </footer>
   );
 }
-

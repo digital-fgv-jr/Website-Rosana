@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { produtos } from "../data/produtos";
 import Header from "../components/Header";
+import HeaderCompact from "../components/HeaderCompact";
 import Footer from "../components/Footer";
-import DropdownSection from "../components/DropdownSection";
+import PreFooter from "../components/PreFooter";
+import WhatsApp from "../components/Atoms/WhatsApp";
 
 export default function Joias() {
   const navigate = useNavigate();
@@ -33,7 +35,12 @@ export default function Joias() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf9f6]">
-      <Header />
+      <Header/>     
+      
+      {/* SENTINELA: é ele que dispara a aparição do header compacto */}
+      <div id="header-sentinel" style={{ position: 'absolute', top: 0, height: 0, margin: 0, padding: 0 }} />
+      
+      <HeaderCompact />
 
       <main className="flex-grow bg-[#faf9f6] py-12 px-6">
         {/* Título e botões */}
@@ -41,23 +48,24 @@ export default function Joias() {
           <h1 className="text-[230%] font-BodoniMT text-[#1c2c3c] mb-4 sm:mb-0">
             Joias
           </h1>
-
-          <div className="flex flex-wrap gap-2">
-            {["todos", "anel", "brinco", "colar", "filigrana", "pingente"].map((cat) => (
-              <button
-                key={cat}
-                onClick={() => mudarFiltro(cat)}
-                className={`px-4 py-2 text-[110%] font-BodoniMT transition
-                  ${
-                    categoriaFiltro === cat
-                      ? "bg-[#1c2c3c] text-white"
-                      : "bg-[#faf9f6] hover:bg-[#c0c0c0] text-[#1c2c3c]"
-                  }`}
-              >
-                {cat === "todos" ? "Ver tudo" : cat.charAt(0).toUpperCase() + cat.slice(1)}
-              </button>
-            ))}
-          </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {["todos", "anel", "brinco", "colar", "filigrana", "pingente"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => mudarFiltro(cat)}
+                  className={`
+                    px-4 py-2 text-[95%] font-MontserratRegular transition-all duration-200 ease-in-out
+                    rounded-lg
+                    ${categoriaFiltro === cat
+                      ? "bg-[#1c2c3c] text-white shadow-md scale-105"
+                      : "bg-[#faf9f6] text-[#1c2c3c] hover:bg-[#c2b280] hover:text-white hover:shadow-lg hover:scale-105"}
+                  `}
+                >
+                  {cat === "todos" ? "Ver tudo" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
         </div>
 
         {/* Linha de informações */}
@@ -66,7 +74,8 @@ export default function Joias() {
             {produtosFiltrados.length} produtos encontrados
           </p>
 
-          <button className="px-4 py-2 text-[110%] font-BodoniMT bg-[#faf9f6] hover:bg-[#c0c0c0] transition">
+          <button className="px-4 py-2 text-[95%] font-MontserratRegular transition-all duration-200 ease-in-out
+                    rounded-lg bg-[#faf9f6] text-[#1c2c3c] hover:bg-[#c2b280] hover:text-white hover:shadow-lg hover:scale-105">
             Filtrar
           </button>
         </div>
@@ -77,7 +86,8 @@ export default function Joias() {
             <Link
               key={produto.id}
               to={`/produto/${produto.id}`}
-              className="bg-[#faf9f6] font-MontserratRegular overflow-hidden transform transition hover:scale-105 hover:shadow-xl"
+              className="bg-brancoperola font-MontserratRegular overflow-hidden transform transition-all duration-300
+            rounded-md hover:rounded-xl hover:scale-105 hover:shadow-xl p-4 cursor-pointer"
             >
               <img
                 src={produto.imagens[0].imagem}
@@ -104,8 +114,9 @@ export default function Joias() {
           </div>
         )}
       </main>
-
-      <DropdownSection />
+      
+      <WhatsApp />
+      <PreFooter />
       <Footer />
     </div>
   );

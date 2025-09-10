@@ -1,18 +1,18 @@
-/* import Header from "../components/Header/Header"
-import HeaderCompact from "../components/HeaderCompact/HeaderCompact";
-import PreFooter from "../components/PreFooter/PreFooter"
-import Footer from "../components/Footer/Footer";
-import WhatsApp from "../components/Atoms/WhatsApp/WhatsApp"; */
+import Header from "../components/Header"
+import HeaderCompact from "../components/HeaderCompact";
+import PreFooter from "../components/PreFooter"
+import Footer from "../components/Footer";
+import WhatsApp from "../components/Atoms/WhatsApp";
 
 export default function CriadasParaVoce() {
     return (
       <div className="bg-[#faf9f6]">
-          {/*<Header/>*/}         
+          <Header/>         
                 
           {/* SENTINELA: é ele que dispara a aparição do header compacto */}
           <div id="header-sentinel" style={{ position: 'absolute', top: 0, height: 0, margin: 0, padding: 0 }} />
           
-          {/*<HeaderCompact />*/}
+          <HeaderCompact />
 
           {/* Título principal */}
           <div className="text-center my-12">
@@ -91,9 +91,9 @@ export default function CriadasParaVoce() {
             </button>
           </div>
      
-          {/*<WhatsApp />
+          <WhatsApp />
           <PreFooter />
-          <Footer />*/}
+          <Footer />
       </div>
     )
 }
