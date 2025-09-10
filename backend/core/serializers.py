@@ -1,4 +1,4 @@
-# Serializers 12.8.4
+# Serializers 12.9.0
 
 from rest_framework import serializers
 from django.conf import settings
@@ -395,7 +395,7 @@ class PedidoSerializer(serializers.ModelSerializer):
             preference_data = {
                 "items": items_para_mp,
                 "payer": {"name": contato.nome, "surname": contato.sobrenome, "email": contato.email},
-                "back_urls": {"success": f"{settings.BASE_URL}/pagamento/sucesso", "failure": f"{settings.BASE_URL}/pagamento/falha", "pending": f"{settings.BASE_URL}/pagamento/pendente"},
+                "back_urls": {"success": f"{settings.FRONTEND_BASE_URL}/pagamento/sucesso", "failure": f"{settings.FRONTEND_BASE_URL}/pagamento/falha", "pending": f"{settings.FRONTEND_BASE_URL}/pagamento/pendente"},
                 "auto_return": "approved",
                 "external_reference": str(pedido.id),
             }
