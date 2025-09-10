@@ -1,3 +1,4 @@
+/* components/Atoms/WhatsApp.module.css */
 :root {
   /* distância da lateral */
   --wa-offset: 20px;
@@ -5,19 +6,27 @@
   --wa-size: 64px;
   /* cor de fundo */
   --wa-bg: #c2b280;
+  /* posição vertical (ajuste conforme layout) */
+  --wa-top: 72%;
 }
 
 .root {
   position: fixed;
-  top: 40%;                 /* um pouco acima do meio da tela */
+  top: var(--wa-top);
   transform: translateY(-50%);
   z-index: 60;
   text-decoration: none;
   outline: none;
+  transition:
+    left .25s ease,
+    right .25s ease,
+    transform .2s ease,
+    box-shadow .2s ease,
+    opacity .2s ease;
 }
 
-.right { right: var(--wa-offset); }
-.left  { left: var(--wa-offset); }
+.right { right: var(--wa-offset); left: auto; }
+.left  { left: var(--wa-offset); right: auto; }
 
 .iconWrap {
   display: inline-flex;
@@ -33,31 +42,28 @@
 
 .root:hover .iconWrap,
 .root:focus-visible .iconWrap {
-  opacity: 1; /* fica 100% no hover */
+  opacity: 1;
   transform: translateY(-1px);
   box-shadow:
     0 10px 24px rgba(0,0,0,.22),
     0 3px 10px rgba(0,0,0,.16);
 }
-
 
 .icon {
   width: 60%;
   height: 60%;
 }
 
-.root:hover .iconWrap,
-.root:focus-visible .iconWrap {
-  transform: translateY(-1px);
-  box-shadow:
-    0 10px 24px rgba(0,0,0,.22),
-    0 3px 10px rgba(0,0,0,.16);
-}
-
-/* mobile: menor */
+/* mobile */
 @media (max-width: 768px) {
   :root {
     --wa-size: 56px;
     --wa-offset: 14px;
+    --wa-top: 78%;
   }
+}
+
+/* acessibilidade: reduz animações se preferido */
+@media (prefers-reduced-motion: reduce) {
+  .root, .iconWrap { transition: none; }
 }

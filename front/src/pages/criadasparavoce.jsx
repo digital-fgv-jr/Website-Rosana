@@ -30,13 +30,13 @@ export default function CriadasParaVoce() {
               <h2 className="text-4xl font-BodoniMT text-[#1c2c3c] mb-6">
                 Cada peça conta uma história
               </h2>
-              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed">
+              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed text-justify">
                 Cada joia personalizada é um diálogo entre a sua história e as mãos
                 que a moldam. É no encontro entre lembranças, sonhos e afetos que 
                 cada peça ganha forma, tornando-se não apenas um adorno, mas um 
                 reflexo sensível daquilo que você viveu e deseja carregar consigo.
               </p> 
-              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed"> 
+              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed text-justify"> 
                 Essas criações nascem para celebrar momentos que não cabem em palavras: 
                 uma conquista, um reencontro, uma memória de família, um amor que merece 
                 ser eternizado. Assim, cada detalhe é pensado para transformar sentimentos
@@ -59,20 +59,20 @@ export default function CriadasParaVoce() {
               <h2 className="text-4xl font-BodoniMT text-[#1c2c3c] mb-6">
                 O artesanal que emociona
               </h2>
-              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed">
+              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed text-justify">
                 Cada joia personalizada é um diálogo entre a sua história e as mãos
                 que a moldam. É no encontro entre lembranças, sonhos e afetos que 
                 cada peça ganha forma, tornando-se não apenas um adorno, mas um 
                 reflexo sensível daquilo que você viveu e deseja carregar consigo.
               </p> 
-              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed"> 
+              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed text-justify"> 
                 Essas criações nascem para celebrar momentos que não cabem em palavras: 
                 uma conquista, um reencontro, uma memória de família, um amor que merece 
                 ser eternizado. Assim, cada detalhe é pensado para transformar sentimentos
                 em matéria, traduzindo sua essência em linhas de ouro e prata, em brilhos 
                 que falam de quem você é.
               </p>
-              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed">
+              <p className="text-gray-700 font-MontserratRegular text-[130%] leading-relaxed text-justify">
                 Cada joia personalizada é um diálogo entre a sua história e as mãos
                 que a moldam. É no encontro entre lembranças, sonhos e afetos que 
                 cada peça ganha forma, tornando-se não apenas um adorno, mas um 
@@ -85,10 +85,11 @@ export default function CriadasParaVoce() {
           <div className="text-center my-12">
             <button
               className="px-6 py-3 bg-[#1c2c3c] text-[#faf9f6] font-MontserratRegular rounded-lg hover:bg-[#25384d] transition"
-              onClick={() => console.log("Clique em entrar em contato")}
+              onClick={() => (window.location.href = "/contato")}
             >
               Entre em contato
             </button>
+
           </div>
      
           <WhatsApp />

@@ -1,10 +1,48 @@
-import { useState } from "react";
+// components/Header.jsx
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { MapPin, Search, Instagram, ShoppingCart } from "lucide-react";
+import { produtos } from "../data/produtos"; // detectar categorias
 import styles from "./Header.module.css";
 
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  const norm = (str) =>
+    (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  const categoriasSet = useMemo(() => {
+    const cs = new Set(
+      produtos
+        .map((p) => (typeof p?.categoria === "string" ? p.categoria : p?.categoria?.nome_categoria))
+        .filter(Boolean)
+        .map((c) => norm(c))
+    );
+    return cs;
+  }, []);
+
+  const goSearch = () => {
+    const term = query.trim();
+    if (!term) return;
+
+    const nterm = norm(term);
+    if (categoriasSet.has(nterm)) {
+      navigate(`/joias?categoria=${encodeURIComponent(nterm)}&q=${encodeURIComponent(term)}`);
+    } else {
+      navigate(`/joias?q=${encodeURIComponent(term)}`);
+    }
+    setQuery("");
+    setSearchOpen(false);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      goSearch();
+    }
+  };
 
   return (
     <header className={styles.root}>
@@ -33,6 +71,7 @@ export default function Header() {
                 className={styles.searchInput}
                 autoFocus
                 onBlur={() => setSearchOpen(false)}
+                onKeyDown={onKeyDown}
               />
             ) : (
               <button
