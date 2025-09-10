@@ -87,7 +87,7 @@ export default function Joias() {
               key={produto.id}
               to={`/produto/${produto.id}`}
               className="bg-brancoperola font-MontserratRegular overflow-hidden transform transition-all duration-300
-            rounded-md hover:rounded-xl hover:scale-105 hover:shadow-xl p-4 cursor-pointer"
+            rounded-md hover:rounded-xl hover:scale-105 hover:shadow-xl p-4 cursor-pointer hover:border hover:border-[#c2b280]"
             >
               <img
                 src={produto.imagens[0].imagem}

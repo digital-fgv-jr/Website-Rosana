@@ -15,7 +15,11 @@ export default function ProdutosRelacionados({ produtos }) {
           <Link
             key={produto.id}
             to={`/produto/${produto.id}`}
-            className="bg-[#faf9f6] overflow-hidden rounded hover:scale-105 transform transition-shadow shadow-sm"
+            className="
+              bg-[#faf9f6] overflow-hidden rounded-lg 
+              transform transition-all duration-200 ease-in-out
+              shadow-sm hover:shadow-xl hover:scale-105 hover:border hover:border-[#c2b280]
+            "
           >
             <img
               src={produto.imagens[0].imagem}
@@ -32,3 +36,4 @@ export default function ProdutosRelacionados({ produtos }) {
     </div>
   );
 }
+

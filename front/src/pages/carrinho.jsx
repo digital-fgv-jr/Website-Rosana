@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { CircleMinus, CirclePlus } from "lucide-react";
 import Header from "../components/Header";
 import HeaderCompact from "../components/HeaderCompact";
 import Footer from "../components/Footer";
 import { produtos } from "../data/produtos";
+import WhatsApp from "../components/Atoms/WhatsApp";
 
 export default function Carrinho() {
   
@@ -85,86 +87,85 @@ export default function Carrinho() {
       <HeaderCompact />
 
 
-      <main className="flex-grow py-12 px-6 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-RoxboroughCFRegular text-gray-800 mb-8">
-          Carrinho
-        </h1>
+        <main className="flex-grow py-12 px-6 max-w-6xl lg:px-12 mx-auto bg-[#faf9f6]">
+        {/* Título principal */}
+        <h1 className="text-6xl font-MontserratRegular text-[#1c2c3c] mb-12">Carrinho</h1>
 
         {carrinho.length === 0 ? (
-          <p className="text-gray-600 text-xl">Seu carrinho está vazio.</p>
+            <p className="text-gray-600 text-xl">Seu carrinho está vazio.</p>
         ) : (
-          <>
+            <>
             {/* Lista de itens */}
-            <div className="flex flex-col gap-6 mb-8">
-              {carrinho.map(item => (
+            <div className="flex flex-col gap-8 mb-12">
+                {carrinho.map(item => (
                 <div
-                  key={item.id}
-                  className="flex items-center justify-between bg-white p-4 rounded shadow"
+                    key={item.id}
+                    className="flex flex-col sm:flex-row items-center sm:items-start justify-between bg-white p-6 rounded shadow-sm"
                 >
-                  <div className="flex items-center gap-4">
+                    {/* Imagem e detalhes */}
+                    <div className="flex items-center gap-6 w-full sm:w-auto">
                     <img
-                      src={item.imagem}
-                      alt={item.nome}
-                      className="w-20 h-20 object-cover rounded"
+                        src={item.imagem}
+                        alt={item.nome}
+                        className="w-32 h-32 sm:w-36 sm:h-36 object-cover rounded"
                     />
-                    <div>
-                      <p className="font-semibold text-gray-800">{item.nome}</p>
-                      <p className="text-gray-600">R$ {item.preco_num.toFixed(2)}</p>
+                    <div className="flex flex-col">
+                        <p className="font-semibold text-[#1c2c3c] text-lg">{item.nome}</p>
+                        <p className="text-gray-600 text-base">R$ {item.preco_num.toFixed(2)}</p>
                     </div>
-                  </div>
+                    </div>
 
-                  {/* Contador de quantidade */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => alterarQuantidade(item.id, -1)}
-                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                    >
-                      -
+                    {/* Contador de quantidade */}
+                    <div className="flex items-center gap-2 mt-4 sm:mt-0">
+                    <button onClick={() => alterarQuantidade(item.id, -1)}>
+                        <CircleMinus
+                        className="w-6 h-6 text-gray-600 transition-transform duration-200 hover:scale-110 hover:text-[#c2b280] cursor-pointer"
+                        />
                     </button>
-                    <span>{item.quantidade}</span>
-                    <button
-                      onClick={() => aumentarQuantidade(item.id)}
-                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                    >
-                      +
+                    <span className="w-6 text-center text-gray-700 font-medium">{item.quantidade}</span>
+                    <button onClick={() => aumentarQuantidade(item.id)}>
+                        <CirclePlus
+                        className="w-6 h-6 text-gray-600 transition-transform duration-200 hover:scale-110 hover:text-[#c2b280] cursor-pointer"
+                        />
                     </button>
-                  </div>
+                    </div>
 
-                  {/* Subtotal e remover */}
-                  <div className="flex flex-col items-end gap-2">
-                    <p className="font-semibold">R$ {(item.preco_num * item.quantidade).toFixed(2)}</p>
+
+                    {/* Subtotal e remover */}
+                    <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
+                    <p className="font-semibold text-[#1c2c3c]">R$ {(item.preco_num * item.quantidade).toFixed(2)}</p>
                     <button
-                      onClick={() => removerItem(item.id)}
-                      className="text-red-600 hover:underline text-sm"
+                        onClick={() => removerItem(item.id)}
+                        className="text-red-600 hover:underline text-sm"
                     >
-                      Remover
+                        Remover
                     </button>
-                  </div>
+                    </div>
                 </div>
-              ))}
+                ))}
             </div>
 
             {/* Resumo */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="font-bold text-xl">Total: R$ {total.toFixed(2)}</p>
-              <div className="flex gap-4">
+                <p className="font-bold text-2xl text-[#1c2c3c]">Total: R$ {total.toFixed(2)}</p>
+                <div className="flex gap-4 mt-4 sm:mt-0">
                 <button
-                  onClick={limparCarrinho}
-                  className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    onClick={limparCarrinho}
+                    className="px-6 py-3 bg-red-600 text-white font-MontserratRegular rounded-lg hover:bg-red-700 transition"
                 >
-                  Limpar Carrinho
+                    Limpar Carrinho
                 </button>
                 <button
-                  className="px-6 py-2 bg-[#1c2c3c] text-white rounded hover:bg-[#25384d]"
+                    className="px-6 py-3 bg-[#1c2c3c] text-white font-MontserratRegular rounded-lg hover:bg-[#25384d] transition"
                 >
-                  Finalizar Compra
+                    Finalizar Compra
                 </button>
-              </div>
+                </div>
             </div>
-          </>
+            </>
         )}
-      </main>
-
+        </main>
+       <WhatsApp /> 
       <Footer />
     </div>
   );
