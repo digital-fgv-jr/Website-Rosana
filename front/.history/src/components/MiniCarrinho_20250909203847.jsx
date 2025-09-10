@@ -1,6 +1,4 @@
-export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho}) {
-  
-
+export default function MiniCarrinho({ carrinho, fechar, limparCarrinho }) {
   if (!carrinho.length) return null;
 
   const total = carrinho.reduce(
@@ -32,7 +30,7 @@ export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho}) {
 
       {/* NOVO BOTÃO */}
         <button
-          onClick={irParaCarrinho}  // usa a prop passada
+          onClick={}  // usa a prop passada
           className="mt-2 px-4 py-2 bg-[#1c2c3c] text-white rounded w-full hover:bg-[#25384d]"
         >
           Ir para o carrinho

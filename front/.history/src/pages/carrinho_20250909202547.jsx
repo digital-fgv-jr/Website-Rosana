@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { produtos } from "../data/produtos";
 
 export default function Carrinho() {
-  
-    const [carrinho, setCarrinho] = useState(() => {
-  const dados = localStorage.getItem("carrinho");
-  return dados ? JSON.parse(dados) : [];
-    });
+  const [carrinho, setCarrinho] = useState([]);
 
   // Carregar carrinho do localStorage ao montar a página
   useEffect(() => {
@@ -36,26 +31,6 @@ export default function Carrinho() {
       })
     );
   };
-
-  //
-  const aumentarQuantidade = (id) => {
-  setCarrinho(prev =>
-    prev.map(item => {
-      if (item.id === id) {
-        const produtoBanco = produtos.find(p => p.id === id);
-        if (!produtoBanco) return item; // fallback
-        const novaQtd = item.quantidade + 1;
-        return {
-          ...item,
-          quantidade: novaQtd > produtoBanco.qtd_disponivel 
-            ? produtoBanco.qtd_disponivel 
-            : novaQtd,
-        };
-      }
-      return item;
-    })
-  );
-};
 
   // Remover item
   const removerItem = (id) => {
@@ -116,7 +91,7 @@ export default function Carrinho() {
                     </button>
                     <span>{item.quantidade}</span>
                     <button
-                      onClick={() => aumentarQuantidade(item.id)}
+                      onClick={() => alterarQuantidade(item.id, 1)}
                       className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
                     >
                       +

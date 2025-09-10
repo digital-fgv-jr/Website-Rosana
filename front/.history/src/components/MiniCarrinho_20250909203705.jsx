@@ -1,6 +1,4 @@
-export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho}) {
-  
-
+export default function MiniCarrinho({ carrinho, fechar, limparCarrinho }) {
   if (!carrinho.length) return null;
 
   const total = carrinho.reduce(

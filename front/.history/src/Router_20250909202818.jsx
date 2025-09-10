@@ -7,7 +7,6 @@ import Eventos from "./pages/eventos";
 import SobreNos from "./pages/sobrenos";
 import Produto from "./pages/produto";
 import Carrinho from "./pages/carrinho";
-import MiniCarrinho from "./components/MiniCarrinho";
 
 function AppRouter() {
   return (

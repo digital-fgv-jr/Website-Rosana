@@ -189,7 +189,7 @@ export default function Produto() {
             fechar={() => setAbrirMiniCarrinho(false)}
             irParaCarrinho={() => {
               setAbrirMiniCarrinho(false); // fecha o popup
-              navigate("/carrinho");       // redireciona para a página de carrinho
+              navigate("/carrinho/");       // redireciona para a página de carrinho
             }}
           />
         )}
