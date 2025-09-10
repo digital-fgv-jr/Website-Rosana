@@ -1,0 +1,281 @@
+:root {
+  --header-h: 65px;
+}
+
+.root {
+  position: relative; /* header normal não-sticky */
+  width: 100%;
+  background-color: #faf9f6;
+  color: #1c2c3c;
+  z-index: 1;
+}
+
+.wrap {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 0rem;
+}
+
+/* ===== Barra superior ===== */
+.topBar {
+  position: relative;
+  display: flex;
+  align-items: center;          /* alinha verticalmente */
+  justify-content: space-between;
+  height: var(--header-h);
+}
+
+/* logo central */
+.logoLink {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 15%;
+}
+.logo {
+  height: 65px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ===== Ações laterais ===== */
+.leftBtn,
+.rightBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 32px;                 /* mesma altura dos ícones/botões */
+  line-height: 1;
+  font-size: 0.875rem;
+  background: #faf9f6;
+  border: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;                    /* zera margens antigas que deslocavam */
+  padding: 0;                   /* aparência “texto+ícone” limpa */
+}
+.leftBtn {
+  margin-left: 0.5rem;
+  text-decoration: underline;
+}
+.leftBtn:hover,
+.rightBtn:hover {
+  opacity: 0.8;
+}
+
+/* Direita: Buscar/Input + Carrinho */
+.rightCol {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;                 /* espaço entre Buscar/Input e carrinho */
+  margin-right: 0.75rem;
+}
+
+/* Input de busca (mesma altura do botão Buscar) */
+.searchInput {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 32px;                /* igual ao .rightBtn */
+  padding: 0 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  min-width: 160px;
+  outline: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;         /* centra o texto verticalmente */
+}
+.searchInput:focus { border-color: #1c2c3c; }
+
+/* Ícone/botão do carrinho */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #1c2c3c;              /* lucide usa stroke=currentColor */
+  border: 1px solid #1c2c3c;
+  border-radius: 50%;
+  background: transparent;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.iconBtn:hover {
+  background: #1c2c3c;
+  color: #fff;
+  border-color: #1c2c3c;
+}
+.iconSvg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* ===================== NAV ===================== */
+.nav {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  justify-items: center;
+  align-items: center;
+  padding: 1.25rem 0;
+  gap: 12rem;
+  font-family: 'Bodoni Moda', serif;
+  white-space: nowrap;
+}
+.nav a {
+  font-size: clamp(0.95rem, 1.2vw, 1.35rem);
+  color: #1c2c3c;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+.nav a:hover { opacity: 0.8; }
+
+/* instagram dentro da nav */
+.navInsta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;                /* espaço entre ícone e texto */
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #1c2c3c;
+  transition: opacity 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+.navInstaIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: #000;
+  border-radius: 50%;
+  line-height: 0;
+  box-sizing: border-box;
+}
+.navInstaIcon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  transform: translateY(-0.5px); /* ajuste óptico */
+}
+.navInstaName {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ===================== Responsivo ===================== */
+@media (max-width: 1024px) {
+  .topBar {
+    height: auto;
+    padding: 1.25rem 0;
+  }
+  .logo { height: 56px; }
+  .nav {
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+  }
+}
+
+/* ===================== RESPONSIVIDADE ADICIONAL ===================== */
+
+/* 1) Desktop grande → reduz um pouco o espaçamento da nav */
+@media (max-width: 1280px) {
+  .nav {
+    gap: 8rem;          /* antes 12rem */
+    padding: 1rem 0;
+  }
+  .logo { height: 60px; }
+}
+
+/* ===== Hotfix responsivo para faixa ~1060px ===== */
+/* 4 colunas + gaps menores entre 1120px e 921px */
+@media (max-width: 1120px) and (min-width: 921px) {
+  .nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;             /* reduz o espaço entre itens */
+    padding: 1rem 0;       /* altura um pouco menor */
+  }
+}
+
+
+/* 3) Tablet landscape → nav em 3 colunas (diminui a altura total) */
+@media (max-width: 920px) {
+  .nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem 2rem;  /* row x col gap */
+    padding: 0.9rem 0;
+  }
+  .nav a { font-size: clamp(0.9rem, 1vw, 1.1rem); }
+  .logo { height: 54px; }
+  .rightCol { margin-right: 0.5rem; }
+}
+
+/* 4) Tablet portrait → nav em 2 colunas, ícone insta menor */
+@media (max-width: 760px) {
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1.25rem;
+    padding: 0.75rem 0;
+  }
+  .navInstaIcon { width: 26px; height: 26px; }
+  .navInstaIcon svg { width: 16px; height: 16px; transform: translateY(-0.3px); }
+  .logo { height: 50px; }
+  .leftBtn, .rightBtn, .searchInput { height: 30px; }
+  .iconBtn { width: 30px; height: 30px; }
+  .iconSvg { width: 17px; height: 17px; }
+}
+
+/* 5) Mobile → nav vira rolagem horizontal (sem quebrar layout) */
+@media (max-width: 640px) {
+  .topBar {
+    height: auto;
+    padding: 0.75rem 0;
+  }
+  .logo { height: 46px; }
+  .logoLink { top: 10%; } /* evita sobrepor com botões laterais */
+
+  .nav {
+    display: flex;                 /* override do grid só no mobile */
+    gap: 1.25rem;
+    padding: 0.5rem 0;
+    overflow-x: auto;              /* rolagem horizontal */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity; /* deslize suave entre itens */
+  }
+  .nav a {
+    flex: 0 0 auto;                /* não encolher */
+    scroll-snap-align: start;
+    font-size: 0.95rem;
+  }
+
+  /* economiza espaço: esconde o texto do insta, mantém o círculo */
+  .navInstaName { display: none; }
+  .navInsta { gap: 0.25rem; }
+}
+
+/* 6) Mobile pequeno → ajustes finos de tamanhos */
+@media (max-width: 420px) {
+  .logo { height: 42px; }
+  .leftBtn { margin-left: 0.25rem; font-size: 0.83rem; }
+  .rightBtn { font-size: 0.83rem; }
+  .searchInput {
+    min-width: 130px;
+    font-size: 0.85rem;
+    padding: 0 0.6rem;
+    height: 28px;
+  }
+  .iconBtn { width: 28px; height: 28px; }
+  .iconSvg { width: 16px; height: 16px; }
+  .nav { gap: 1rem; }
+}
+
+/* 7) Muito pequeno (ex.: 360px) → ainda mais compacto */
+@media (max-width: 360px) {
+  .logo { height: 40px; }
+  .leftBtn, .rightBtn { font-size: 0.8rem; }
+  .nav a { font-size: 0.9rem; }
+}
