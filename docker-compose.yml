@@ -37,17 +37,11 @@ services:
     networks:
       - app_net
 
-  frontend:
+  nginx:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: frontend
-    networks:
-      - app_net
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx-proxy
+    container_name: nginx
     ports:
       - "82:80"
     volumes:
@@ -57,7 +51,6 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - frontend
       - backend
     restart: unless-stopped
     networks:
