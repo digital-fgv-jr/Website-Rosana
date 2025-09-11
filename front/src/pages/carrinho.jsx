@@ -34,6 +34,13 @@ export default function Carrinho() {
       maximumFractionDigits: 2,
     });
 
+  const parseBRL = (s = "") => {
+    if (typeof s === "number") return s;
+    return Number(
+      String(s).replace(/[^\d,.-]/g, "").replace(/\.(?=\d{3}(?:\D|$))/g, "").replace(",", ".")
+    ) || 0;
+  };
+
   // Busca imagem: prioriza a salva no item; senão, pega do "produtos"
   const getImagem = (item) => {
     if (item?.imagem) return item.imagem;
@@ -41,15 +48,28 @@ export default function Carrinho() {
     return p?.imagens?.[0]?.imagem || "/placeholder.jpg";
   };
 
-  // Quantidade (mínimo 1, respeita estoque se existir)
+  const getEstoque = (id) =>
+    produtos.find((p) => p.id === id)?.qtd_disponivel ?? Infinity;
+
+  const getUnitPrice = (item) =>
+    typeof item.preco_num === "number" ? item.preco_num : parseBRL(item.preco);
+
+  // Quantidade:
+  // - respeita estoque
+  // - se a nova quantidade cair para 0 ou menos, REMOVE o item
   const alterarQuantidade = (id, delta) => {
     setCarrinho((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item;
-        const estoque = produtos.find((p) => p.id === id)?.qtd_disponivel ?? Infinity;
-        const novaQtd = Math.max(1, (item.quantidade || 1) + delta);
-        return { ...item, quantidade: Math.min(novaQtd, estoque) };
-      })
+      prev
+        .map((item) => {
+          if (item.id !== id) return item;
+          const estoque = getEstoque(id);
+          const atual = Number(item.quantidade || 1);
+          const nova = atual + delta;
+          if (nova <= 0) return null; // remove
+          const limitada = Math.min(nova, estoque);
+          return { ...item, quantidade: limitada };
+        })
+        .filter(Boolean) // remove os nulos (itens removidos)
     );
   };
 
@@ -67,9 +87,9 @@ export default function Carrinho() {
   // Finalizar compra → normaliza e redireciona para checkout
   function finalizarCompra() {
     const items = carrinho.map((i) => ({
-      id: i.id || i.sku || i.slug, // opcional
+      id: i.id || i.sku || i.slug,
       title: i.nome,
-      unit_price: Number(i.preco_num || i.preco || 0),
+      unit_price: Number(getUnitPrice(i) || 0),
       quantity: Number(i.quantidade || 1),
       picture_url: i.imagem || i.foto || i.picture_url || "",
     }));
@@ -80,7 +100,7 @@ export default function Carrinho() {
 
   // Totais
   const total = carrinho.reduce(
-    (acc, item) => acc + item.preco_num * item.quantidade,
+    (acc, item) => acc + getUnitPrice(item) * Number(item.quantidade || 1),
     0
   );
 
@@ -127,7 +147,7 @@ export default function Carrinho() {
                       <div className="flex flex-col">
                         <p className="text-[#1c2c3c] text-lg font-semibold font-MontserratRegular">{item.nome}</p>
                         <p className="text-gray-700 text-base font-MontserratRegular">
-                          R$ {formatBRL(item.preco_num)}
+                          R$ {formatBRL(getUnitPrice(item))}
                         </p>
                       </div>
                     </div>
@@ -139,7 +159,7 @@ export default function Carrinho() {
                         aria-label="Diminuir quantidade"
                         className="p-1 rounded hover:bg-[#faf9f6] transition"
                       >
-                        <CircleMinus className="w-6 h-6 text-gray-700 hover:scale-110 hover:text-[#c2b280]" />
+                        <CircleMinus className="w-6 h-6 text-gray-700 transition-transform duration-200 hover:scale-110 hover:text-[#c2b280]" />
                       </button>
 
                       <span className="w-8 text-center text-gray-800 font-medium font-MontserratRegular">
@@ -151,14 +171,14 @@ export default function Carrinho() {
                         aria-label="Aumentar quantidade"
                         className="p-1 rounded hover:bg-[#faf9f6] transition"
                       >
-                        <CirclePlus className="w-6 h-6 text-gray-700 hover:scale-110 hover:text-[#c2b280]" />
+                        <CirclePlus className="w-6 h-6 text-gray-700 transition-transform duration-200 hover:scale-110 hover:text-[#c2b280]" />
                       </button>
                     </div>
 
                     {/* Subtotal + remover */}
                     <div className="flex flex-col items-end gap-2 mt-4 sm:mt-0">
                       <p className="font-MontserratRegular font-semibold text-[#1c2c3c]">
-                        R$ {formatBRL(item.preco_num * item.quantidade)}
+                        R$ {formatBRL(getUnitPrice(item) * Number(item.quantidade || 1))}
                       </p>
                       <button
                         onClick={() => removerItem(item.id)}

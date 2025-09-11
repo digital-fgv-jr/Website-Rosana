@@ -11,12 +11,7 @@ export default function Cookies() {
         <p className={style.text}>
           Utilizamos cookies para melhorar a sua experiência no site.
           <br />
-          <a
-            className={style.link}
-            href="/politica-de-cookies"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a className={style.link} href="/privacidade#cookies">
             Acesse a nossa Política de Cookies
           </a>{" "}
           para saber mais.
