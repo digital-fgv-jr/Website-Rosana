@@ -236,7 +236,6 @@
     padding: 0.75rem 0;
   }
   .logo { height: 46px; }
-  .logoLink { top: 10%; } /* evita sobrepor com botões laterais */
 
   .nav {
     display: flex;                 /* override do grid só no mobile */
@@ -278,4 +277,50 @@
   .logo { height: 40px; }
   .leftBtn, .rightBtn { font-size: 0.8rem; }
   .nav a { font-size: 0.9rem; }
+}
+
+
+/* === MOBILE POLISH (≤640px) — sobrescreve e centraliza tudo certinho === */
+@media (max-width: 640px) {
+  .wrap { padding: 0 12px; }
+
+  /* barra com altura fixa e sem pular */
+  .topBar {
+    height: 56px;      /* altura estável */
+    padding: 0;        /* já temos altura fixa */
+  }
+
+  /* logo 100% centralizado na faixa superior */
+  .logoLink {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* centraliza vertical e horizontal */
+  }
+  .logo { height: 46px; }             /* folga segura */
+
+  /* ações laterais mais compactas */
+  .leftBtn, .rightBtn { 
+    height: 28px; 
+    font-size: 0.85rem; 
+  }
+
+  .rightCol { gap: 0.35rem; }
+
+  /* input de busca que não estoura layout */
+  .searchInput {
+    height: 28px;
+    min-width: 120px;
+    max-width: 44vw;   /* não empurra o logo */
+  }
+
+  .iconBtn { width: 30px; height: 30px; }
+  .iconSvg { width: 17px; height: 17px; }
+}
+
+/* telas bem pequenas */
+@media (max-width: 400px) {
+  .searchInput {
+    min-width: 110px;
+    max-width: 50vw;
+  }
 }

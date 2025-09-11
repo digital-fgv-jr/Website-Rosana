@@ -74,6 +74,12 @@ button:focus-visible {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+html, body { scroll-behavior: smooth; }
+
 @font-face {
   font-family: 'RoxboroughCF';
   src: url('./assets/fonts/RoxboroughCF-Bold.woff') format('woff');

@@ -85,7 +85,17 @@
   font-size: 1.05rem;
   margin: 0 0 10px 0;
   color: var(--fg);
+
 }
+
+/* base das colunas (desktop/tablet mantêm alinhamento à esquerda) */
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;          /* respiro entre título e lista */
+  min-width: 0;      /* evita overflow de texto longo */
+}
+
 
 .colList {
   list-style: none;
@@ -218,3 +228,48 @@
 @media (prefers-reduced-motion: reduce) {
   .toTopBtn, .insta { transition: none; }
 }
+
+@media (max-width: 560px) {
+  .topBar { padding: 14px 14px 6px; }
+  .topBar::before { top: 26px; }
+
+  .grid {
+    grid-template-columns: 1fr;  /* 1 coluna no mobile */
+    gap: 1rem;
+  }
+
+  /* centraliza conteúdo das colunas no mobile */
+  .col {
+    align-items: center;
+    text-align: center;
+  }
+
+  .colTitle {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .colList li + li { margin-top: 6px; }
+
+  /* melhora legibilidade e alvo de toque dos links no mobile */
+  .colList a {
+    display: inline-block;
+    padding: 6px 0;                /* alvo de toque confortável */
+    font-size: 0.95rem;            /* um pouco maior no mobile */
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* instagram centralizado e com respiro embaixo */
+  .insta {
+    justify-self: center;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 560px) {
+  .colTitle {
+    font-weight: 700; /* bold no mobile */
+  }
+}
+
