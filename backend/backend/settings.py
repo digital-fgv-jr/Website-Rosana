@@ -9,6 +9,8 @@ import ast
 SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False')) == True
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+ADMIN_DOMAIN = os.getenv('ADMIN_DOMAIN', 'admin.localhost')
+API_DOMAIN = os.getenv('API_DOMAIN', 'api.localhost')
 
 # Chaves de API
 API_KEY = os.getenv('API_KEY')
@@ -62,6 +64,7 @@ JAZZMIN_UI_TWEAKS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'core.middleware.SubdomainURLConfMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
