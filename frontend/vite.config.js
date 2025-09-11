@@ -19,5 +19,6 @@ export default defineConfig({
     postcss: {
       plugins: [tailwindcss()],
     },
-  }
+  },
+  allowedHosts: ['compilerhub.store']
 })

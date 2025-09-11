@@ -1,14 +1,14 @@
-# Views v4.2.1
+# Views v4.3.0
 
-from rest_framework import viewsets, permissions, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from .permissions import HasAPIKey
 
 
 from django.conf import settings
 from django.db import transaction
-from rest_framework import status, permissions
 import mercadopago
 
 from .models import Loja, Categoria, Produto, Pedido, InformacoesEntrega
@@ -38,7 +38,7 @@ class LojaViewSet(viewsets.ReadOnlyModelViewSet):
         'endereco_set', 'contatoloja__contato', 'categoria_set__produto_set'
     )
     serializer_class = LojaInfoSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
     @action(detail=True, methods=['get'])
     def categorias(self, request, pk=None):
@@ -54,7 +54,7 @@ class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Categoria.objects.all()
     serializer_class = ListaProdutosCategoria
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
 class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -64,7 +64,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Produto.objects.all()
     serializer_class = ProdutoSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
 # --- Views de Contato (leitura) ---
 
@@ -74,7 +74,7 @@ class ContatoNormalViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = ContatoNormal.objects.filter(contatoloja__isnull=True)
     serializer_class = ListaContatosNormaisSerializer
-    permission_classes = [permissions.AllowAny] # Mude para IsAdminUser em produção
+    permission_classes = [HasAPIKey] # Mude para IsAdminUser em produção
 
 class ContatoDeLojaViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -83,7 +83,7 @@ class ContatoDeLojaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = ContatoDeLoja.objects.filter(contatoloja__isnull=False)
     serializer_class = ListaContatosLojaSerializer
-    permission_classes = [permissions.AllowAny] # Mude para IsAdminUser em produção
+    permission_classes = [HasAPIKey] # Mude para IsAdminUser em produção
 
 # --- Views do Fluxo de Compra ---
 
@@ -92,7 +92,7 @@ class FreteAPIView(APIView):
     Endpoint para cotação de frete.
     - POST /api/cotar-frete/
     """
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
     def post(self, request, *args, **kwargs):
         serializer = FreteSerializer(data=request.data)
@@ -111,14 +111,14 @@ class PedidoViewSet(mixins.CreateModelMixin,
     """
     queryset = Pedido.objects.all().order_by('-data_hora_criacao')
     serializer_class = PedidoSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
 class MercadoPagoWebhookView(APIView):
     """
     Recebe e processa webhooks do Mercado Pago, atualizando o status do pedido
     e realizando o estorno de estoque em caso de falha no pagamento.
     """
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
     def post(self, request, *args, **kwargs):
         notification_id = request.data.get('data', {}).get('id')
@@ -170,7 +170,7 @@ class FrenetWebhookView(APIView):
     Recebe e processa notificações de webhook da Frenet.
     Atualiza o status do pedido com base no status de rastreamento da entrega.
     """
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [HasAPIKey]
 
     def post(self, request, *args, **kwargs):
         data = request.data
