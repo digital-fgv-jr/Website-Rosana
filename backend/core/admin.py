@@ -1,4 +1,4 @@
-# Admin v12.4.1
+# Admin v12.6.0
 
 from django.contrib import admin
 from django.utils.html import format_html
@@ -226,14 +226,18 @@ class TamanhoProdutoInline(admin.TabularInline):
 ## FINALIZADO ##
 @admin.register(Produto)
 class Produtos(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'categoria', 'preco', 'preview_da_imagem_lista')
-    list_display_links = ('id', 'nome', 'categoria', 'preview_da_imagem_lista',)
-    list_filter = ('categoria',)
-    search_fields = ('nome', 'descricao', 'categoria__nome_categoria', 'loja__apelido')
+    list_display = ('nome', 'listar_categorias', 'preco', 'preview_da_imagem_lista')
+    list_display_links = ('nome', 'preview_da_imagem_lista',)
+    list_filter = ('id', 'nome', 'descricao', 'categorias__nome_categoria',)
+    search_fields = ('id', 'nome', 'descricao', 'categoria__nome_categoria',)
     list_per_page = 20
     exclude=('qtd_em_compra',)
     
     inlines = [DetalheProdutoInline, ImagemProdutoInline, TamanhoProdutoInline]
+
+    @admin.display(description='Categorias', ordering='categorias__nome_categoria')
+    def listar_categorias(self, obj):
+        return ", ".join([c.nome_categoria for c in obj.categorias.all()])
 
     @admin.display(description='Imagem Principal')
     def preview_da_imagem_lista(self, obj):
@@ -241,6 +245,11 @@ class Produtos(admin.ModelAdmin):
         if imagem_produto and imagem_produto.imagem:
             return format_html('<img src="{0}" width="auto" height="80px" />', imagem_produto.imagem.imagem.url)
         return "Sem Imagem"
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.prefetch_related('categorias', 'imagemproduto_set__imagem')
+        return queryset
 
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido

@@ -12,6 +12,12 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 ADMIN_DOMAIN = os.getenv('ADMIN_DOMAIN', 'admin.localhost')
 API_DOMAIN = os.getenv('API_DOMAIN', 'api.localhost')
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [f"https://{os.getenv('ADMIN_DOMAIN')}"]
+
 # Chaves de API
 API_KEY = os.getenv('API_KEY')
 MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN')

@@ -1,10 +1,11 @@
-# Database v14.4.1
+# Database v14.13.1
 import uuid
 from io import BytesIO
 from PIL import Image as PILImage
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.db import models
+import os
 
 from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
 from .utils.validations import CPFValidator
@@ -88,7 +89,7 @@ class Endereco(BaseModel):
             CEPValidator,
             ],
         )
-    loja = models.ForeignKey(Loja, on_delete=models.CASCADE, null=True, blank=True)
+    loja = models.ForeignKey(Loja, on_delete=models.SET_NULL, null=True, blank=True)
     logradouro = models.CharField(max_length=128, blank=False, null=False)
     numero = models.PositiveIntegerField(blank=False, null=False, verbose_name='Número')
     complemento = models.CharField(max_length=128, blank=True, null=True)
@@ -192,7 +193,7 @@ class Categoria(BaseModel):
         verbose_name_plural = 'Categorias'
 
 class Produto(BaseModel):
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    categorias = models.ManyToManyField(Categoria, verbose_name="Categorias")
     nome = models.CharField(max_length=128)
     descricao = models.TextField(verbose_name='Descrição')
     qtd_disponivel = models.PositiveIntegerField(default=1, verbose_name='Quantidade Disponível')
@@ -251,7 +252,7 @@ class DetalheProduto(BaseModel):
 
 class Tamanho(BaseModel):
     nome = models.CharField(max_length=32)
-    valor = models.CharField(max_length=2)
+    valor = models.CharField(max_length=5)
 
     def __str__(self):
         return f'{self.nome} [{self.valor}]'
@@ -326,10 +327,15 @@ class Imagem(BaseModel):
         verbose_name_plural = 'Imagens'
 
     def save(self, *args, **kwargs):
-        imagem_foi_trocada = self.imagem.name != self._original_imagem_name
+
+        imagem_foi_trocada = self.imagem and self.imagem.name != self._original_imagem_name
         arquivo_antigo = self._original_imagem_name if self.pk and imagem_foi_trocada else None
 
-        if self.imagem and imagem_foi_trocada:
+        if imagem_foi_trocada:
+            id_unico = str(uuid.uuid4())
+            extensao_original = os.path.splitext(self.imagem.name)[1] if self.imagem.name else '.webp'
+            novo_nome = f"{id_unico}{extensao_original}"
+
             try:
                 img = PILImage.open(self.imagem).convert('RGB')
                 MAX_HEIGHT = 1080
@@ -339,22 +345,26 @@ class Imagem(BaseModel):
                     novo_width = int(aspect_ratio * MAX_HEIGHT)
                     img = img.resize((novo_width, MAX_HEIGHT), PILImage.Resampling.LANCZOS)
 
+                novo_nome = f"{id_unico}.webp"
                 buffer = BytesIO()
                 img.save(buffer, format='webp', quality=85)
-                
-                novo_nome = f"{uuid.uuid4()}.webp"
                 self.imagem.save(novo_nome, ContentFile(buffer.getvalue()), save=False)
-            
+                print(f"Imagem salva como: {novo_nome}")
             except Exception as e:
                 print(f"Erro ao processar a imagem: {e}")
-                self.imagem.name = self._original_imagem_name
-                super().save(*args, **kwargs)
-                return
-
-        super().save(*args, **kwargs)
+                try:
+                    with self.imagem.open('rb') as f:
+                        self.imagem.save(novo_nome, ContentFile(f.read()), save=False)
+                    print(f"Imagem original salva como: {novo_nome}")
+                except Exception as e2:
+                    print(f"Erro ao salvar imagem original: {e2}")
+                    raise
         
-        if arquivo_antigo:
+        super().save(*args, **kwargs)
+
+        if arquivo_antigo and arquivo_antigo != self.imagem.name:
             if default_storage.exists(arquivo_antigo):
+                print(f"Excluindo imagem antiga: {arquivo_antigo}")
                 default_storage.delete(arquivo_antigo)
 
     def delete(self, *args, **kwargs):

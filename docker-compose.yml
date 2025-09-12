@@ -1,5 +1,6 @@
 services:
   db_postgres:
+    container_name: db_postgres
     image: postgres:17.6-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -17,13 +18,10 @@ services:
       - app_net
   
   backend:
+    container_name: backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    container_name: backend
-    command: >
-      sh -c "python manage.py migrate && 
-             gunicorn --bind 0.0.0.0:8000 backend.wsgi:application"
     volumes:
       - ./backend:/usr/src/app
       - static_volume:/usr/src/app/static
@@ -38,10 +36,10 @@ services:
       - app_net
 
   nginx:
+    container_name: nginx
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: nginx
     ports:
       - "82:80"
     volumes:
