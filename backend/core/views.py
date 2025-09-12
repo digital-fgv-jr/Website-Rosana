@@ -1,4 +1,4 @@
-# Views v4.3.0
+# Views v4.4.2
 
 from rest_framework import viewsets, mixins, status
 from rest_framework.views import APIView
@@ -30,9 +30,9 @@ from .serializers import (
 class LojaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint para visualizar lojas e seus catálogos.
-    - GET /api/lojas/
-    - GET /api/lojas/{id}/
-    - GET /api/lojas/{id}/categorias/
+    - GET /lojas/
+    - GET /lojas/{id}/
+    - GET /lojas/{id}/categorias/
     """
     queryset = Loja.objects.prefetch_related(
         'endereco_set', 'contatoloja__contato', 'categoria_set__produto_set'
@@ -50,7 +50,7 @@ class LojaViewSet(viewsets.ReadOnlyModelViewSet):
 class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint para visualizar uma categoria e seus produtos.
-    - GET /api/categorias/{id}/
+    - GET /categorias/{id}/
     """
     queryset = Categoria.objects.all()
     serializer_class = ListaProdutosCategoria
@@ -59,8 +59,8 @@ class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
 class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint para visualizar produtos.
-    - GET /api/produtos/
-    - GET /api/produtos/{id}/
+    - GET /produtos/
+    - GET /produtos/{id}/
     """
     queryset = Produto.objects.all()
     serializer_class = ProdutoSerializer
@@ -71,6 +71,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
 class ContatoNormalViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint para listar contatos de clientes.
+    - GET /contatos-clientes/
     """
     queryset = ContatoNormal.objects.filter(contatoloja__isnull=True)
     serializer_class = ListaContatosNormaisSerializer
@@ -78,8 +79,8 @@ class ContatoNormalViewSet(viewsets.ReadOnlyModelViewSet):
 
 class ContatoDeLojaViewSet(viewsets.ReadOnlyModelViewSet):
     """
-
     Endpoint para listar contatos de lojas.
+    - GET /contatos-lojas/
     """
     queryset = ContatoDeLoja.objects.filter(contatoloja__isnull=False)
     serializer_class = ListaContatosLojaSerializer
@@ -90,7 +91,7 @@ class ContatoDeLojaViewSet(viewsets.ReadOnlyModelViewSet):
 class FreteAPIView(APIView):
     """
     Endpoint para cotação de frete.
-    - POST /api/cotar-frete/
+    - POST /cotar-frete/
     """
     permission_classes = [HasAPIKey]
 
@@ -105,9 +106,9 @@ class PedidoViewSet(mixins.CreateModelMixin,
                     viewsets.GenericViewSet):
     """
     ViewSet para criar e visualizar pedidos.
-    - POST /api/pedidos/ -> Cria um novo pedido (checkout).
-    - GET /api/pedidos/ -> Lista os pedidos.
-    - GET /api/pedidos/{id}/ -> Detalhes de um pedido.
+    - POST /pedidos/ -> Cria um novo pedido (checkout).
+    - GET /pedidos/ -> Lista os pedidos.
+    - GET /pedidos/{id}/ -> Detalhes de um pedido.
     """
     queryset = Pedido.objects.all().order_by('-data_hora_criacao')
     serializer_class = PedidoSerializer

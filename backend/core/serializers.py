@@ -312,15 +312,13 @@ class PedidoSerializer(serializers.ModelSerializer):
     contato_cliente = ContatoSerializer(read_only=True)
     endereco_entrega = EnderecoSerializer(read_only=True)
     info_entrega = InformacoesEntregaSerializer(read_only=True)
-    itens = ItemPedidoSerializer(many=True, read_only=True)
+    itens = FreteItemInputSerializer(many=True, write_only=True)
     status = serializers.CharField(source='get_status_display', read_only=True)
     valor_total = serializers.SerializerMethodField()
 
     # Campos para POST
     itens = FreteItemInputSerializer(many=True, write_only=True)
-    endereco_entrega_id = serializers.PrimaryKeyRelatedField(
-        queryset=Endereco.objects.all(), source='endereco_entrega', write_only=True
-    )
+    endereco_entrega_data = EnderecoSerializer(write_only=True)
     contato_cliente_data = ContatoSerializer(write_only=True, source='contato_cliente')
     frete_escolhido = FreteEscolhidoInputSerializer(write_only=True)
 
@@ -329,7 +327,7 @@ class PedidoSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'status', 'data_hora_criacao', 'contato_cliente', 'endereco_entrega',
             'info_entrega', 'valor_total', 'url_pagamento', 'itens',
-            'endereco_entrega_id', 'contato_cliente_data', 'frete_escolhido'
+            'endereco_entrega_data', 'contato_cliente_data', 'frete_escolhido'
         ]
 
     def get_valor_total(self, obj):
@@ -340,13 +338,20 @@ class PedidoSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # 1. SEPARAÇÃO DOS DADOS DE ENTRADA
         itens_data = validated_data.pop('itens')
-        endereco = validated_data.pop('endereco_entrega')
-        contato_data = validated_data.pop('contato_cliente')
+        endereco_data = validated_data.pop('endereco_entrega_data')
+        contato_data = validated_data.pop('contato_cliente_data')
         frete_data = validated_data.pop('frete_escolhido')
 
         # 2. CRIAÇÃO/BUSCA DO CONTATO (CHECKOUT DE CONVIDADO)
-        contato, _ = Contato.objects.get_or_create(cpf=contato_data['cpf'], defaults=contato_data)
-        
+        contato, created = Contato.objects.get_or_create(
+            cpf=contato_data['cpf'],
+            defaults={
+                'nome': contato_data['nome'],
+                'sobrenome': contato_data['sobrenome'],
+                'email': contato_data['email'],
+            }
+        )
+
         # 3. VALIDAÇÃO DE ESTOQUE COMPARTILHADO (PRÉ-TRANSAÇÃO)
         produto_quantidades = {}
         for item in itens_data:
@@ -365,6 +370,7 @@ class PedidoSerializer(serializers.ModelSerializer):
         pedido = None
         # 4. TRANSAÇÃO ATÔMICA (OPERAÇÃO SEGURA NO BANCO)
         with transaction.atomic():
+            endereco = Endereco.objects.create(**endereco_data)
             info_entrega = InformacoesEntrega.objects.create(
                 entrega_estimada=frete_data['data_entrega_estimada'],
                 transportadora=frete_data['transportadora'],

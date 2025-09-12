@@ -1,4 +1,4 @@
-# Database v14.3.2
+# Database v14.4.1
 import uuid
 from io import BytesIO
 from PIL import Image as PILImage
@@ -332,10 +332,19 @@ class Imagem(BaseModel):
         if self.imagem and imagem_foi_trocada:
             try:
                 img = PILImage.open(self.imagem).convert('RGB')
+                MAX_HEIGHT = 1080
+                original_width, original_height = img.size
+                if original_height > MAX_HEIGHT:
+                    aspect_ratio = original_width / original_height
+                    novo_width = int(aspect_ratio * MAX_HEIGHT)
+                    img = img.resize((novo_width, MAX_HEIGHT), PILImage.Resampling.LANCZOS)
+
                 buffer = BytesIO()
                 img.save(buffer, format='webp', quality=85)
+                
                 novo_nome = f"{uuid.uuid4()}.webp"
                 self.imagem.save(novo_nome, ContentFile(buffer.getvalue()), save=False)
+            
             except Exception as e:
                 print(f"Erro ao processar a imagem: {e}")
                 self.imagem.name = self._original_imagem_name

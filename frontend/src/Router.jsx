@@ -8,6 +8,7 @@ import SobreNos from "./pages/sobrenos";
 import Produto from "./pages/produto";
 import Carrinho from "./pages/carrinho";
 import MiniCarrinho from "./components/MiniCarrinho";
+import CalculadoraFrete from './components/CalculadoraFrete';
 
 function AppRouter() {
   return (
@@ -21,6 +22,8 @@ function AppRouter() {
           <Route path="/sobre-nos" element={<SobreNos />} />
           <Route path="/produto/:id" element={<Produto />} />
           <Route path="/carrinho/" element={<Carrinho />}/>
+
+          <Route path="/calcular-frete/" element={<CalculadoraFrete />}/>
         </Routes>     
     </Router>
   );
