@@ -311,7 +311,17 @@ export default function Joias() {
               className="bg-brancoperola font-MontserratRegular overflow-hidden transform transition-all duration-300 rounded-md hover:rounded-xl hover:scale-105 hover:shadow-xl border border-transparent hover:border-[#c2b280]"
             >
               <div className="w-full aspect-square sm:aspect-[4/3] md:h-64 overflow-hidden bg-[#f1efe9]">
-                <img src={produto.__thumb} alt={produto.nome} className="w-full h-full object-cover" loading="lazy" />
+                {(() => {
+                  const thumb = produto.__thumb || produto.imagens?.[0]?.imagem || '/caminho/para/imagem_padrao.jpg';
+                  return (
+                    <img
+                      src={thumb}
+                      alt={produto.nome}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  );
+                })()}
               </div>
               <div className="p-3 sm:p-4 text-left">
                 <h2 className="text-[0.95rem] sm:text-lg font-semibold line-clamp-2">{produto.nome}</h2>
