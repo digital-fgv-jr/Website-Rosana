@@ -20,6 +20,10 @@ export const formatarProdutoParaFrontend = (produtoDaApi) => {
     descricao: produtoDaApi.descricao,
     preco: precoFormatado,
     qtd_disponivel: produtoDaApi.qtd_disponivel,
+    // Campo auxiliar usado pela página de Joias para exibir a miniatura
+    __thumb: imagemPrincipal,
+    // Alias opcional para usos futuros
+    __image: imagemPrincipal,
     // Pega o nome da categoria do objeto aninhado
     categoria: { 
       nome_categoria: produtoDaApi.categoria?.nome_categoria?.toLowerCase() || 'sem-categoria' 
