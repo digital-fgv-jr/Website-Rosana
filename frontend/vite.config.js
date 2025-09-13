@@ -20,5 +20,5 @@ export default defineConfig({
       plugins: [tailwindcss()],
     },
   },
-  allowedHosts: ['compilerhub.store']
+  allowedHosts: ['compilerhub.store', 'http://api.compilerhub.store']
 })
