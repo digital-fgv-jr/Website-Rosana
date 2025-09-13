@@ -23,9 +23,18 @@ from .models import (
 
 ## Propriedades Básicas
 class ImagemSerializer(serializers.ModelSerializer):
+    # Força retorno relativo (ex.: "/media/...") para funcionar em diferentes hosts/portas
+    imagem = serializers.SerializerMethodField()
+
     class Meta:
         model = Imagem
         fields = ['id', 'titulo', 'imagem']
+
+    def get_imagem(self, obj):
+        try:
+            return obj.imagem.url  # normaliza como path relativo a MEDIA_URL
+        except Exception:
+            return None
 
 class TamanhoSerializer(serializers.ModelSerializer):
     class Meta:
