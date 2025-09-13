@@ -90,20 +90,10 @@ const getCategoriaSlugFromProduto = (p) =>
 
 /** Mapeia aliases da URL/UI -> slug real do dataset */
 const mapCategoriaParamToSlug = (param) => {
-  if (!param) return "todos";
-  // Normaliza o texto: remove acentos e deixa em minúsculo
-  const s = String(param)
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  if (s === "aneis" || s === "anel") return "anel";
-  if (s === "brincos" || s === "brinco") return "brinco";
-  if (s === "colares" || s === "colar" || s === "cordao") return "colar";
-  if (s === "pingentes" || s === "pingente") return "pingente";
-  if (s === "braceletes" || s === "pulseira") return "bracelete"; // Unificando pulseira/bracelete
-  
-  // Para outros como 'filigrana' e 'todos', o 's' já estará correto
+  const s = String(param || "").toLowerCase();
+  if (s === "brinco" || s === "brincos") return "brincos";
+  if (s === "colar" || s === "cordao") return "cordao";
+  // os demais já batem
   return s;
 };
 
@@ -175,19 +165,10 @@ export default function Joias() {
   }, []);
 
   /* ===================== Filtros ===================== */
-
-
-const getCategoriasDoProduto = (p) => {
-    // A API agora retorna uma lista de categorias
-    if (!p?.categorias || p.categorias.length === 0) return [];
-    return p.categorias.map(cat => mapCategoriaParamToSlug(cat.nome_categoria));
-};
-
-const matchCategoria = (p) => {
+  const matchCategoria = (p) => {
     if (categoriaFiltro === "todos") return true;
-    const slugsDoProduto = getCategoriasDoProduto(p);
-    return slugsDoProduto.includes(categoriaFiltro);
-};
+    return getCategoriaSlugFromProduto(p) === categoriaFiltro;
+  };
 
   const matchMateriais = (p) => {
     if (!materiaisSel.length) return true;
@@ -227,23 +208,7 @@ const matchCategoria = (p) => {
     .filter(matchMateriais)
     .filter(matchPreco)
     .filter(matchPeso)
-    .filter(matchTam);const mapCategoriaParamToSlug = (param) => {
-  if (!param) return "todos";
-  // Normaliza o texto: remove acentos e deixa em minúsculo
-  const s = String(param)
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-
-  if (s === "aneis" || s === "anel") return "anel";
-  if (s === "brincos" || s === "brinco") return "brinco";
-  if (s === "colares" || s === "colar" || s === "cordao") return "colar";
-  if (s === "pingentes" || s === "pingente") return "pingente";
-  if (s === "braceletes" || s === "pulseira") return "bracelete"; // Unificando pulseira/bracelete
-  
-  // Para outros como 'filigrana' e 'todos', o 's' já estará correto
-  return s;
-};
+    .filter(matchTam);
 
   const mudarFiltro = (slugUi) => {
     const slug = mapCategoriaParamToSlug(slugUi);
