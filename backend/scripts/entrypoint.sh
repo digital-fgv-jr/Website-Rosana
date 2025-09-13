@@ -34,4 +34,6 @@ EOF
 # 'exec' é importante pois substitui o processo do script pelo do Gunicorn,
 # tornando o Gunicorn o processo principal (PID 1) do contêiner.
 echo "Iniciando Gunicorn..."
-exec gunicorn --bind 0.0.0.0:8000 backend.wsgi:application
+# Respeita a porta definida pelo provedor (Heroku/Render) ou usa 8000 por padrão
+PORT="${PORT:-8000}"
+exec gunicorn --bind 0.0.0.0:${PORT} backend.wsgi:application

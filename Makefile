@@ -1,4 +1,5 @@
-.PHONY: help build-frontend build-backend deploy-frontend deploy-backend up down logs
+.PHONY: help build-frontend build-backend deploy-frontend deploy-backend up down logs \
+	deploy-heroku-backend deploy-heroku-frontend
 
 help:
 	@echo "Available targets:"
@@ -9,6 +10,8 @@ help:
 	@echo "  up               docker compose up -d (all)"
 	@echo "  down             docker compose down"
 	@echo "  logs             docker compose logs -f"
+	@echo "  deploy-heroku-backend  Deploy backend (Docker) para Heroku (usa HEROKU_BACKEND_APP)"
+	@echo "  deploy-heroku-frontend Deploy frontend (Docker) para Heroku (usa HEROKU_FRONTEND_APP)"
 
 build-frontend:
 	./scripts/build-frontend.sh
@@ -31,3 +34,8 @@ down:
 logs:
 	docker compose logs -f
 
+deploy-heroku-backend:
+	./scripts/heroku-deploy-backend.sh
+
+deploy-heroku-frontend:
+	./scripts/heroku-deploy-frontend.sh
