@@ -248,10 +248,20 @@ class FreteSerializer(serializers.Serializer):
             "SellerCEP": cep_origem, "RecipientCEP": cep_destino_limpo,
             "ShipmentInvoiceValue": float(valor_total_produtos), "ShippingItemArray": items_para_frenet
         }
-        headers_frenet = {"Accept": "application/json", "Content-Type": "application/json", "token": settings.FRENET_TOKEN}
+        token_frenet = getattr(settings, 'FRENET_API_KEY', None) or getattr(settings, 'FRENET_TOKEN', None)
+        api_url_frenet = getattr(settings, 'FRENET_API_URL', None)
+
+        if not token_frenet or not api_url_frenet:
+            raise serializers.ValidationError("Configuração da API de frete ausente: defina FRENET_API_KEY (ou FRENET_TOKEN) e FRENET_API_URL.")
+
+        headers_frenet = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "token": token_frenet,
+        }
 
         try:
-            response_frenet = requests.post(settings.FRENET_API_URL, json=payload_frenet, headers=headers_frenet)
+            response_frenet = requests.post(api_url_frenet, json=payload_frenet, headers=headers_frenet)
             response_frenet.raise_for_status()
             resultado = response_frenet.json()
             opcoes_frete = resultado.get('ShippingServicesArray', [])

@@ -5,23 +5,39 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 import os
 import ast
 
+"""Configurações principais do Django e variáveis de ambiente."""
 # Django
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False')) == True
+# Evita "== True" frágil; aceita strings comuns ("1", "true", "True")
+try:
+    DEBUG = ast.literal_eval(os.getenv('DEBUG', 'False')) is True
+except Exception:
+    DEBUG = False
+
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 ADMIN_DOMAIN = os.getenv('ADMIN_DOMAIN', 'admin.localhost')
 API_DOMAIN = os.getenv('API_DOMAIN', 'api.localhost')
+FRONTEND_DOMAIN = os.getenv('FRONTEND_DOMAIN', 'localhost:5173')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = [f"https://{os.getenv('ADMIN_DOMAIN')}", f"https://{os.getenv('FRONTEND_DOMAIN')}"]
+# Em dev, permitir http do frontend; em prod, manter https
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{ADMIN_DOMAIN}",
+    f"https://{FRONTEND_DOMAIN}",
+    f"http://{FRONTEND_DOMAIN}",
+]
 
-# Chaves de API
+"""Chaves de API/Integrações"""
 API_KEY = os.getenv('API_KEY')
 MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN')
 FRENET_API_KEY = os.getenv('FRENET_API_KEY')
+# Compatibilidade com código antigo que referia FRENET_TOKEN
+FRENET_TOKEN = os.getenv('FRENET_TOKEN', FRENET_API_KEY)
+# URL da API de cotação de frete (ex.: https://api.frenet.com.br/shipping/quote)
+FRENET_API_URL = os.getenv('FRENET_API_URL')
 
 # PSQL
 POSTGRES_DB = os.getenv('POSTGRES_DB')
