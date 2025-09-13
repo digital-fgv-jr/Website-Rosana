@@ -1,43 +1,43 @@
-Title: Backend hardening, env config, and Docker production readiness
+Título: Hardening do backend, configuração de ambiente e Docker pronto para produção
 
-Summary
-- Harden Docker image for production and Pillow/system deps.
-- Make settings more robust to env inputs and CSRF origins.
-- Fix Frenet integration config handling and error messages.
-- Relax webhook auth (AllowAny) pending signature validation.
-- Simplify entrypoint to stop recreating migrations at runtime.
-- Add pinned production requirements list.
-- Expand README with run and env instructions.
+Resumo
+- Endurece a imagem Docker e adiciona libs de sistema (Pillow etc.).
+- Torna as configurações mais robustas a envs e CSRF do frontend.
+- Corrige uso de credenciais/URL da Frenet e mensagens de erro.
+- Libera autenticação de webhooks (AllowAny) enquanto não há verificação de assinatura.
+- Simplifica o entrypoint removendo recriação de migrações em runtime.
+- Adiciona `requirements.prod.txt` com dependências pinadas para produção.
+- Expande o README com instruções de execução e variáveis de ambiente.
 
-Why these changes
+Por que essas mudanças
 - backend/Dockerfile
-  - Add Alpine build and image libraries (jpeg, zlib, freetype, tiff, etc.) so Pillow and related packages build and run reliably in production.
-  - Switch to `requirements.prod.txt` to ensure pinned, deterministic builds for production (separate from any dev-only requirements).
-  - Remove `collectstatic` from build stage to avoid coupling image build with runtime environment variables and storage; static collection now happens at startup via entrypoint.
+  - Inclui bibliotecas de build e imagem do Alpine (jpeg, zlib, freetype, tiff, etc.) para que o Pillow e pacotes relacionados compilem/rodem de forma confiável em produção.
+  - Passa a usar `requirements.prod.txt` para builds determinísticos (separado de dependências só de desenvolvimento).
+  - Remove `collectstatic` do estágio de build para evitar acoplamento com variáveis/armazenamento de runtime; a coleta ocorre na inicialização via entrypoint.
 
 - backend/backend/settings.py
-  - Robust DEBUG parsing: avoid `== True` pattern which is fragile with string envs; fall back to False on invalid input to be safer in production.
-  - Introduce `FRONTEND_DOMAIN` and include `http://` for CSRF trusted origins in development while keeping `https://` for production.
-  - Group and document API keys; add compatibility for legacy `FRENET_TOKEN` while preferring `FRENET_API_KEY`.
-  - Add `FRENET_API_URL` to avoid hardcoding endpoints and allow environment-based configuration.
+  - Parsing de DEBUG mais seguro: evita o padrão `== True`, que é frágil com strings vindas do ambiente; em caso de valor inválido, assume False (mais seguro em prod).
+  - Introduz `FRONTEND_DOMAIN` e adiciona `http://` (além de `https://`) aos `CSRF_TRUSTED_ORIGINS` para facilitar desenvolvimento local.
+  - Agrupa/documenta chaves de API; mantém compatibilidade com `FRENET_TOKEN`, priorizando `FRENET_API_KEY`.
+  - Adiciona `FRENET_API_URL` para não fixar endpoint no código e permitir configuração por ambiente.
 
 - backend/core/serializers.py
-  - Read Frenet credentials from either `FRENET_API_KEY` or `FRENET_TOKEN` and require `FRENET_API_URL` explicitly. This prevents silent failures when envs are missing and produces clearer validation errors for misconfiguration.
-  - Use the computed `api_url_frenet` instead of referencing settings directly to align with the validation logic.
+  - Lê credenciais da Frenet de `FRENET_API_KEY` ou `FRENET_TOKEN` e exige `FRENET_API_URL`. Em caso de falta de configuração, retorna erro de validação claro (evita falhas silenciosas).
+  - Usa a URL computada (`api_url_frenet`) ao invés de referenciar diretamente `settings`, alinhando a validação e a chamada.
 
 - backend/core/views.py
-  - Set `AllowAny` for Mercado Pago and Frenet webhook endpoints. Webhooks typically cannot include a client API key; the correct approach is request signature validation (to be added). This change restores webhook reachability while acknowledging the need for HMAC/signature verification later.
+  - Define `AllowAny` para webhooks do Mercado Pago e da Frenet. Normalmente webhooks não enviam API Key do cliente; o correto é validar a assinatura/HMAC (a ser implementado). A mudança restaura a acessibilidade dos webhooks e sinaliza o próximo passo de segurança.
 
 - backend/scripts/entrypoint.sh
-  - Remove deletion and recreation of Django migrations at container startup. Recreating migrations at runtime is unsafe and can corrupt schema history; migrations should be versioned and applied deterministically. Keep `migrate` and `collectstatic` at startup.
+  - Remove a deleção/recriação de migrações na subida do contêiner. Recriar migrações em runtime é arriscado e pode corromper o histórico; as migrações devem ser versionadas e aplicadas de forma determinística. Mantém `migrate` e `collectstatic` na inicialização.
 
 - backend/requirements.prod.txt
-  - Add a locked set of production dependencies (Django, DRF, Pillow, psycopg2-binary, requests, gunicorn, etc.) to ensure reproducible builds and avoid surprise upgrades.
+  - Adiciona um conjunto pinado de dependências (Django, DRF, Pillow, psycopg2-binary, requests, gunicorn, etc.) para builds reproduzíveis e sem upgrades surpresa.
 
 - README.md
-  - Expand instructions with Docker usage, environment variables, and architecture notes. Clarify that secrets must not be shipped to the frontend and that webhooks should validate signatures instead of requiring client API keys.
+  - Expande instruções com uso de Docker, variáveis de ambiente e notas de arquitetura. Reforça que segredos não devem ir para o bundle do frontend e que webhooks devem validar assinatura, não exigir API Key do cliente.
 
-Notes and next steps
-- Consider adding webhook signature verification for MP and Frenet.
-- Ensure `CSRF_TRUSTED_ORIGINS` matches deployed domains (http/https as appropriate).
-- If using S3 or another backend for static files, move `collectstatic` to the deploy phase with appropriate credentials.
+Notas e próximos passos
+- Implementar validação de assinatura/HMAC para MP e Frenet.
+- Garantir que `CSRF_TRUSTED_ORIGINS` reflita os domínios em produção (http/https conforme o caso).
+- Se usar S3 ou outro backend de estáticos, mover `collectstatic` para a etapa de deploy com credenciais adequadas.
