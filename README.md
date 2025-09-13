@@ -105,3 +105,26 @@ Se quiser acessar usando os hostnames configurados no Nginx local (porta 82):
   - Admin: `http://admin.compilerhub.store:82`
 
 Observação: a API retorna paths relativos para imagens (`/media/...`) e o frontend monta a URL final usando `VITE_API_URL`. Por isso é essencial definir `VITE_API_URL` com o host/porta corretos (incluindo `:82`).
+
+## Deploy isolado (frontend e backend)
+
+Para simplificar releases independentes, este repositório agora possui scripts e targets que permitem publicar apenas o frontend (nginx) ou apenas o backend, sem reiniciar os demais serviços.
+
+- Pré‑requisito: `docker compose` e um `.env` válido na raiz.
+
+- Build isolado:
+  - `make build-frontend` (imagem do nginx que serve o bundle do Vite)
+  - `make build-backend` (imagem do Django + Gunicorn)
+
+- Deploy isolado (sem rebuild):
+  - `make deploy-frontend` (sobe/aplica somente `nginx` com `--no-deps`)
+  - `make deploy-backend` (sobe/aplica somente `backend` com `--no-deps`)
+
+- Deploy isolado com build no mesmo passo:
+  - `BUILD=1 make deploy-frontend`
+  - `BUILD=1 make deploy-backend`
+
+Notas:
+- O backend já executa migrações e `collectstatic` no entrypoint ao subir o container.
+- O serviço `nginx` serve o frontend estático e expõe as rotas de API/Admin (conforme `nginx/nginx.conf`). Se necessário, você pode publicar apenas o `backend` (ex.: hotfix) sem tocar no `nginx`.
+- Para publicar ambos como antes: `docker compose up -d --build`.
