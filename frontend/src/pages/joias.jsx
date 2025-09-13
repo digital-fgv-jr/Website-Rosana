@@ -86,7 +86,7 @@ const getMateriaisFromProduto = (p) => {
 
 /** Categoria do produto (dataset usa { nome_categoria }) */
 const getCategoriaSlugFromProduto = (p) =>
-  String(p?.categoria?.nome_categoria || p?.categoria || "").toLowerCase();
+  String(p?.categoria?.nome_categoria || p?.categoria || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 /** Mapeia aliases da URL/UI -> slug real do dataset */
 const mapCategoriaParamToSlug = (param) => {

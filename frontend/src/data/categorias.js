@@ -9,11 +9,11 @@ const mapCategoriaParamToSlug = (param) => {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-  if (s === "aneis" || s === "anel") return "anel";
-  if (s === "brincos" || s === "brinco") return "brinco";
-  if (s === "colares" || s === "colar" || s === "cordao") return "colar";
-  if (s === "pingentes" || s === "pingente") return "pingente";
-  if (s === "braceletes" || s === "pulseira") return "bracelete"; // Unificando pulseira/bracelete
+  if (s === "aneis" || s === "anel") return "aneis";
+  if (s === "brincos" || s === "brinco") return "brincos";
+  if (s === "colares" || s === "colar" || s === "cordao") return "colares";
+  if (s === "pingentes" || s === "pingente") return "pingentes";
+  if (s === "braceletes" || s === "pulseira") return "braceletes"; // Unificando pulseira/bracelete
   
   // Para outros como 'filigrana' e 'todos', o 's' já estará correto
   return s;
