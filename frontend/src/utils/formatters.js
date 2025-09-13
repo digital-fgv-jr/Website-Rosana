@@ -6,7 +6,7 @@
  */
 // Normaliza URLs de imagens vindas do backend para o ambiente atual (dev/prod)
 const API_BASE = (import.meta?.env?.VITE_API_URL || '').replace(/\/+$/, '');
-const PLACEHOLDER = '/caminho/para/imagem_padrao.jpg';
+const PLACEHOLDER = '/placeholder.svg';
 
 function normalizeImageUrl(url) {
   if (!url) return PLACEHOLDER;

@@ -312,13 +312,14 @@ export default function Joias() {
             >
               <div className="w-full aspect-square sm:aspect-[4/3] md:h-64 overflow-hidden bg-[#f1efe9]">
                 {(() => {
-                  const thumb = produto.__thumb || produto.imagens?.[0]?.imagem || '/caminho/para/imagem_padrao.jpg';
+                  const thumb = produto?.__thumb || produto?.imagens?.[0]?.imagem || '/placeholder.svg';
                   return (
                     <img
                       src={thumb}
                       alt={produto.nome}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
                     />
                   );
                 })()}
