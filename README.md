@@ -55,3 +55,27 @@ Observação: não exponha segredos no bundle do frontend. `VITE_API_KEY` serve 
 - Webhooks (Mercado Pago e Frenet) não exigem API Key do cliente. É recomendado adicionar verificação de assinatura/HMAC.
 - Migrações são aplicadas em runtime, mas não são recriadas automaticamente. Versione as migrações normalmente em `backend/core/migrations/`.
 - Para processamento de imagens e integrações externas sob carga, considere mover tarefas para workers (Celery/RQ).
+
+## Desenvolvimento (hot reload)
+
+Pré‑requisitos
+- Docker e Docker Compose instalados.
+- Arquivo `.env` na raiz com as variáveis (veja exemplo acima). Para dev, use:
+  - `VITE_API_URL=http://localhost:8000`
+  - `VITE_API_KEY=dev-only` (não use segredos reais)
+
+Como iniciar
+- Suba os serviços de desenvolvimento (o override já habilita hot reload):
+  - `docker compose up`
+  - Opcionalmente, para evitar subir o Nginx de produção: `docker compose up backend db_postgres frontend-dev`
+
+Serviços e URLs
+- Frontend (Vite + HMR): `http://localhost:5173`
+- Backend (Django autoreload): `http://localhost:8000`
+- Admin (Django): `http://localhost:8000/admin`
+
+Detalhes
+- O arquivo `docker-compose.override.yml` troca o backend para `runserver` (com autoreload) e adiciona o serviço `frontend-dev` (Vite com HMR).
+- Em macOS/Windows, `CHOKIDAR_USEPOLLING=true` já está ligado no `frontend-dev` para detectar mudanças via Docker Desktop.
+- CORS/CSRF já permitem `http://localhost:5173`. Se trocar host/porta, ajuste `FRONTEND_DOMAIN`, `CORS_ALLOWED_ORIGINS` e `CSRF_TRUSTED_ORIGINS` conforme necessário.
+- Variáveis que começam com `VITE_` ficam públicas no bundle. Use apenas valores de desenvolvimento.
