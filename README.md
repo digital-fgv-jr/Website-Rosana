@@ -79,3 +79,29 @@ Detalhes
 - Em macOS/Windows, `CHOKIDAR_USEPOLLING=true` já está ligado no `frontend-dev` para detectar mudanças via Docker Desktop.
 - CORS/CSRF já permitem `http://localhost:5173`. Se trocar host/porta, ajuste `FRONTEND_DOMAIN`, `CORS_ALLOWED_ORIGINS` e `CSRF_TRUSTED_ORIGINS` conforme necessário.
 - Variáveis que começam com `VITE_` ficam públicas no bundle. Use apenas valores de desenvolvimento.
+
+### Acesso via "compilerhub" (porta 82)
+
+Se quiser acessar usando os hostnames configurados no Nginx local (porta 82):
+
+- Adicione ao `/etc/hosts`:
+  - `127.0.0.1 compilerhub.store`
+  - `127.0.0.1 api.compilerhub.store`
+  - `127.0.0.1 admin.compilerhub.store`
+
+- Ajuste o `.env` (antes do build do frontend):
+  - `VITE_API_URL=http://api.compilerhub.store:82`
+  - `FRONTEND_DOMAIN=compilerhub.store:82`
+  - `API_DOMAIN=api.compilerhub.store`
+  - `ADMIN_DOMAIN=admin.compilerhub.store`
+  - Inclua em `ALLOWED_HOSTS`: `compilerhub.store,api.compilerhub.store,admin.compilerhub.store`
+
+- Rebuild do frontend para incorporar as variáveis `VITE_*`:
+  - `docker compose up --build` (ou `docker compose build nginx`)
+
+- URLs:
+  - Frontend: `http://compilerhub.store:82`
+  - API: `http://api.compilerhub.store:82`
+  - Admin: `http://admin.compilerhub.store:82`
+
+Observação: a API retorna paths relativos para imagens (`/media/...`) e o frontend monta a URL final usando `VITE_API_URL`. Por isso é essencial definir `VITE_API_URL` com o host/porta corretos (incluindo `:82`).
