@@ -10,6 +10,33 @@ import WhatsApp from "../components/Atoms/WhatsApp";
 import FiltroProdutos from "../components/FiltroProdutos";
 
 /* ========================= Helpers ========================= */
+// Garante que a imagem sempre aponte para a origem do backend,
+// preservando apenas o path/query/hash recebido do campo de imagem.
+const backendOrigin = (() => {
+  try {
+    const url = new URL(import.meta.env.VITE_API_URL);
+    return url.origin; // ex.: http://localhost:8000
+  } catch (_e) {
+    try {
+      return window.location.origin;
+    } catch (_e2) {
+      return "";
+    }
+  }
+})();
+
+const toBackendUrl = (input) => {
+  const placeholder = "/placeholder.svg";
+  if (!input) return placeholder;
+  try {
+    const parsed = new URL(input, backendOrigin || undefined);
+    // Reescreve para a origem do backend, mantendo apenas path/query/hash
+    return `${backendOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch (_e) {
+    const path = String(input).startsWith("/") ? String(input) : `/${String(input)}`;
+    return `${backendOrigin}${path}`;
+  }
+};
 const parseNumberSmart = (v) => {
   if (v === undefined || v === null || v === "") return null;
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
@@ -312,10 +339,11 @@ export default function Joias() {
             >
               <div className="w-full aspect-square sm:aspect-[4/3] md:h-64 overflow-hidden bg-[#f1efe9]">
                 {(() => {
-                  const thumb = produto?.__thumb || produto?.imagens?.[0]?.imagem || '/placeholder.svg';
+                  const raw = produto?.__thumb || produto?.imagens?.[0]?.imagem || "/placeholder.svg";
+                  const src = toBackendUrl(raw);
                   return (
                     <img
-                      src={thumb}
+                      src={src}
                       alt={produto.nome}
                       className="w-full h-full object-cover"
                       loading="lazy"
