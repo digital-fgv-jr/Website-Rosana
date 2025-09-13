@@ -1,6 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { CirclePlus, CircleMinus } from "lucide-react";
+
+// --- 1. IMPORTAÇÕES DA API ---
+import { getProdutoById } from "../api/services/produtoService";
+import { buscarEFormatarProdutos } from "../data/produtos"; // Busca e formata a lista completa
+import { formatarProdutoParaFrontend } from "../utils/formatters"; // Formata um único produto
+
 import MiniCarrinho from "../components/MiniCarrinho";
 import { produtos } from "../data/produtos";
 import ProdutosRelacionados from "../components/ProdutosRelacionados";
@@ -73,9 +79,15 @@ const mapCategoria = (raw) => {
 
 export default function Produto() {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const produto = produtos.find((p) => p.id === Number(id));
+  const { id } = useParams(); // Pega o ID da URL
 
+  // --- 2. ESTADOS PARA DADOS DA API ---
+  const [produto, setProduto] = useState(null); // Para o produto principal da página
+  const [todosProdutos, setTodosProdutos] = useState([]); // Para a seção "Relacionados"
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Estados de interação do usuário (carrinho, quantidade)
   const [quantidade, setQuantidade] = useState(1);
   const [carrinho, setCarrinho] = useState(() => {
     const dados = localStorage.getItem("carrinho");
@@ -83,9 +95,53 @@ export default function Produto() {
   });
   const [abrirMiniCarrinho, setAbrirMiniCarrinho] = useState(false);
 
+  // --- 3. LÓGICA PARA BUSCAR OS DADOS DA API ---
+  useEffect(() => {
+    const carregarDados = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Busca o produto específico E a lista de todos os produtos em paralelo
+        const [respostaProduto, listaCompletaFormatada] = await Promise.all([
+          getProdutoById(id),
+          buscarEFormatarProdutos()
+        ]);
+
+        if (respostaProduto.data) {
+          const produtoFormatado = formatarProdutoParaFrontend(respostaProduto.data);
+          setProduto(produtoFormatado);
+          setTodosProdutos(listaCompletaFormatada);
+        } else {
+          setError("Produto não encontrado.");
+        }
+      } catch (err) {
+        setError("Não foi possível carregar o produto. Tente novamente mais tarde.");
+        console.error("Erro ao buscar dados do produto:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarDados();
+  }, [id]); // Roda a busca sempre que o ID na URL mudar
+
   useEffect(() => {
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
   }, [carrinho]);
+
+  // --- 4. RENDERIZAÇÃO CONDICIONAL (LOADING, ERRO, SUCESSO) ---
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando produto...</div>;
+  }
+
+  if (error || !produto) {
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col">
+        <p className="text-gray-600 text-xl">{error || "Produto não encontrado."}</p>
+        <Link to="/joias" className="mt-4 px-4 py-2 bg-[#1c2c3c] text-white rounded">Voltar para a loja</Link>
+      </div>
+    );
+  }
 
   if (!produto) {
     return (
@@ -285,8 +341,8 @@ export default function Produto() {
 
       {/* Relacionados */}
       <ProdutosRelacionados
-        produtos={produtos.filter(
-          (p) => (p.categoria?.nome_categoria || p.categoria) === (produto.categoria?.nome_categoria || produto.categoria) && p.id !== produto.id
+        produtos={todosProdutos.filter(
+          (p) => p.categoria?.nome_categoria === produto.categoria?.nome_categoria && p.id !== produto.id
         )}
       />
 

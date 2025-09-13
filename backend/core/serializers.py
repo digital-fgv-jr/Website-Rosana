@@ -204,22 +204,31 @@ class FreteSerializer(serializers.Serializer):
         for item_info in itens_data:
             try:
                 tamanho_produto = TamanhoProduto.objects.select_related(
-                    'produto__categoria__loja__endereco_set'
+                    'produto' 
+                ).prefetch_related(
+                    'produto__categorias__loja__endereco_set' 
                 ).get(id=item_info['tamanho_id'])
+                
                 produto = tamanho_produto.produto
             except TamanhoProduto.DoesNotExist:
                 raise serializers.ValidationError(f"Tamanho de produto com ID {item_info['tamanho_id']} não encontrado.")
 
             if not cep_origem:
-                loja_endereco = produto.categoria.loja.endereco_set.first()
+                primeira_categoria = produto.categorias.first()
+                if not primeira_categoria:
+                    raise serializers.ValidationError(f"O produto '{produto.nome}' não está associado a nenhuma categoria.")
+                
+                loja = primeira_categoria.loja
+                loja_endereco = loja.endereco_set.first()
                 if not loja_endereco:
-                    raise serializers.ValidationError(f"A loja do produto '{produto.nome}' não possui um endereço de origem cadastrado.")
+                    raise serializers.ValidationError(f"A loja '{loja.apelido}' do produto '{produto.nome}' não possui um endereço de origem cadastrado.")
+                
                 cep_origem = loja_endereco.cep.replace('-', '')
+            print('#'*200)
+            print(cep_origem)
             
             produto_quantidades[produto.id] = produto_quantidades.get(produto.id, 0) + item_info['quantidade']
-            
             max_dias_preparacao = max(max_dias_preparacao, produto.dias_para_disponibilizar)
-
             valor_total_produtos += item_info['quantidade'] * produto.preco
             items_para_frenet.append({
                 "Weight": float(produto.peso), "Length": float(produto.comprimento),

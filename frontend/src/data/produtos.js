@@ -1,3 +1,29 @@
+import { getProdutos } from "../api/services/produtoService"
+import { formatarProdutoParaFrontend } from "../utils/formatters"
+
+export const buscarEFormatarProdutos  = async () => {
+  try {
+    // 1. Busca os produtos da API
+    const response = await getProdutos();
+    const produtosDaApi = response.data;
+
+    // 2. Verifica se a resposta é uma lista
+    if (!Array.isArray(produtosDaApi)) {
+      console.error("A resposta da API de produtos não é uma lista.");
+      return [];
+    }
+
+    // 3. Usa o adaptador para formatar cada produto da lista
+    const produtosFormatados = produtosDaApi.map(formatarProdutoParaFrontend);
+
+    return produtosFormatados;
+
+  } catch (error) {
+    console.error("Erro ao buscar e formatar produtos:", error);
+    return []; // Retorna um array vazio em caso de erro
+  }
+};
+
 export const produtos = [
   {
     id: 1,
@@ -270,4 +296,3 @@ export const produtos = [
     altura: "0.40"
   }
 ];
-

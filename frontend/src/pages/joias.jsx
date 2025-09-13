@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { produtos } from "../data/produtos";
+import { buscarEFormatarProdutos } from "../data/produtos";
+import { buscarEFormatarCategorias } from "../data/categorias";
 import Header from "../components/Header";
 import HeaderCompact from "../components/HeaderCompact";
 import Footer from "../components/Footer";
@@ -89,32 +90,37 @@ const getCategoriaSlugFromProduto = (p) =>
 
 /** Mapeia aliases da URL/UI -> slug real do dataset */
 const mapCategoriaParamToSlug = (param) => {
-  const s = String(param || "").toLowerCase();
-  if (s === "brinco" || s === "brincos") return "brincos";
-  if (s === "colar" || s === "cordao") return "cordao";
-  // os demais já batem
+  if (!param) return "todos";
+  // Normaliza o texto: remove acentos e deixa em minúsculo
+  const s = String(param)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (s === "aneis" || s === "anel") return "anel";
+  if (s === "brincos" || s === "brinco") return "brinco";
+  if (s === "colares" || s === "colar" || s === "cordao") return "colar";
+  if (s === "pingentes" || s === "pingente") return "pingente";
+  if (s === "braceletes" || s === "pulseira") return "bracelete"; // Unificando pulseira/bracelete
+  
+  // Para outros como 'filigrana' e 'todos', o 's' já estará correto
   return s;
 };
-
-/** Catálogo visível (label) -> slug real (dataset) */
-const CATEGORIAS = [
-  { slug: "todos", label: "Ver tudo" },
-  { slug: "anel", label: "Anel" },
-  { slug: "brincos", label: "Brinco" },  // dataset usa "brincos"
-  { slug: "cordao", label: "Colar" },    // dataset usa "cordao"
-  { slug: "pingente", label: "Pingente" },
-  { slug: "pulseira", label: "Pulseira" },
-];
 
 /* ========================= Página ========================= */
 export default function Joias() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [produtos, setProdutos] = useState([]); // Começa como um array vazio
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);   // Estado para controlar o carregamento
+  const [error, setError] = useState(null);       // Estado para erros
+
   const params = new URLSearchParams(location.search);
   const categoriaInicial = mapCategoriaParamToSlug(params.get("categoria") || "todos");
 
-  const [categoriaFiltro, setCategoriaFiltro] = useState(categoriaInicial);
+  const [categoriaFiltro, setCategoriaFiltro] = useState("todos");
   const [visibleCount, setVisibleCount] = useState(9);
 
   const [openFiltro, setOpenFiltro] = useState(false);
@@ -126,20 +132,35 @@ export default function Joias() {
   const [tamMin, setTamMin] = useState("");
   const [tamMax, setTamMax] = useState("");
 
+  useEffect(() => {
+    const carregarDadosIniciais = async () => {
+      try {
+        // Usa Promise.all para carregar produtos e categorias em paralelo
+        const [produtosDaApi, categoriasDaApi] = await Promise.all([
+          buscarEFormatarProdutos(),
+          buscarEFormatarCategorias()
+        ]);
+        
+        setProdutos(produtosDaApi);
+        setCategorias(categoriasDaApi);
+
+      } catch (err) {
+        setError("Não foi possível carregar os dados da página. Tente novamente mais tarde.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarDadosIniciais();
+  }, []);
+
   // Reage a mudanças na URL e normaliza aliases
   useEffect(() => {
     const p = new URLSearchParams(location.search);
     const slug = mapCategoriaParamToSlug(p.get("categoria") || "todos");
     setCategoriaFiltro(slug);
   }, [location.search]);
-
-  // Thumb segura
-  const produtosComThumb = useMemo(() => {
-    return produtos.map((p, i) => {
-      const thumb = p?.imagens?.[0]?.imagem || p?.imagem || `/produtos/produto${(i % 18) + 1}.jpg`;
-      return { ...p, __thumb: thumb };
-    });
-  }, []);
 
   // Materiais disponíveis (dedupe case-insensitive, preservando forma mais “bonita”)
   const materiaisDisponiveis = useMemo(() => {
@@ -154,10 +175,19 @@ export default function Joias() {
   }, []);
 
   /* ===================== Filtros ===================== */
-  const matchCategoria = (p) => {
+
+
+const getCategoriasDoProduto = (p) => {
+    // A API agora retorna uma lista de categorias
+    if (!p?.categorias || p.categorias.length === 0) return [];
+    return p.categorias.map(cat => mapCategoriaParamToSlug(cat.nome_categoria));
+};
+
+const matchCategoria = (p) => {
     if (categoriaFiltro === "todos") return true;
-    return getCategoriaSlugFromProduto(p) === categoriaFiltro;
-  };
+    const slugsDoProduto = getCategoriasDoProduto(p);
+    return slugsDoProduto.includes(categoriaFiltro);
+};
 
   const matchMateriais = (p) => {
     if (!materiaisSel.length) return true;
@@ -192,12 +222,28 @@ export default function Joias() {
     return true;
   };
 
-  const produtosFiltrados = produtosComThumb
+  const produtosFiltrados = produtos
     .filter(matchCategoria)
     .filter(matchMateriais)
     .filter(matchPreco)
     .filter(matchPeso)
-    .filter(matchTam);
+    .filter(matchTam);const mapCategoriaParamToSlug = (param) => {
+  if (!param) return "todos";
+  // Normaliza o texto: remove acentos e deixa em minúsculo
+  const s = String(param)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (s === "aneis" || s === "anel") return "anel";
+  if (s === "brincos" || s === "brinco") return "brinco";
+  if (s === "colares" || s === "colar" || s === "cordao") return "colar";
+  if (s === "pingentes" || s === "pingente") return "pingente";
+  if (s === "braceletes" || s === "pulseira") return "bracelete"; // Unificando pulseira/bracelete
+  
+  // Para outros como 'filigrana' e 'todos', o 's' já estará correto
+  return s;
+};
 
   const mudarFiltro = (slugUi) => {
     const slug = mapCategoriaParamToSlug(slugUi);
@@ -215,6 +261,7 @@ export default function Joias() {
       pesoMax: wMax = "",
     } = payload;
 
+    
     setMateriaisSel(mSel);
     setPrecoMin(pMin);
     setPrecoMax(pMax);
@@ -224,6 +271,22 @@ export default function Joias() {
     setTamMax("");
     setVisibleCount(9);
   };
+
+  if (loading) {
+        return (
+            <div className="min-h-screen flex justify-center items-center bg-[#faf9f6]">
+                <p className="text-xl font-BodoniMT">Carregando joias...</p>
+            </div>
+        );
+  }
+  
+  if (error) {
+      return (
+          <div className="min-h-screen flex justify-center items-center bg-[#faf9f6]">
+              <p className="text-xl text-red-600 font-BodoniMT">{error}</p>
+          </div>
+      );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#faf9f6]">
@@ -239,7 +302,7 @@ export default function Joias() {
 
             <div className="-mx-6 px-6 sm:mx-0">
               <div className="flex gap-2 overflow-x-auto no-scrollbar whitespace-nowrap snap-x snap-mandatory sm:flex-wrap sm:overflow-visible">
-                {CATEGORIAS.map(({ slug, label }) => (
+                {categorias.map(({ slug, label }) => (
                   <button
                     key={slug}
                     onClick={() => mudarFiltro(slug)}
