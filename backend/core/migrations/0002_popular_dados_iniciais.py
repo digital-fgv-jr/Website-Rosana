@@ -71,6 +71,7 @@ def popular_dados(apps, schema_editor):
         tamanhos_aneis[str(val)], _ = Tamanho.objects.get_or_create(nome="Anel", valor=str(val))
     for val in ["PP", "P", "M", "G", "GG"]:
         tamanhos_braceletes[val], _ = Tamanho.objects.get_or_create(nome="Bracelete", valor=val)
+    tamanho_unico, _ = Tamanho.objects.get_or_create(nome="Único", valor="UNICO")
     print("Tamanhos criados com sucesso.")
 
 
@@ -133,14 +134,14 @@ def popular_dados(apps, schema_editor):
             if any(cat in ['Anel', 'Anéis'] for cat in categorias_nomes):
                 for tamanho_obj in tamanhos_aneis.values():
                     TamanhoProduto.objects.create(produto=produto, tamanho=tamanho_obj)
-            
-            if any(cat in ['Colar', 'Colares'] for cat in categorias_nomes):
+            elif any(cat in ['Colar', 'Colares'] for cat in categorias_nomes):
                 for tamanho_obj in tamanhos_colares.values():
                     TamanhoProduto.objects.create(produto=produto, tamanho=tamanho_obj)
-            
-            if any(cat in ['Bracelete', 'Braceletes'] for cat in categorias_nomes):
+            elif any(cat in ['Bracelete', 'Braceletes'] for cat in categorias_nomes):
                 for tamanho_obj in tamanhos_braceletes.values():
                     TamanhoProduto.objects.create(produto=produto, tamanho=tamanho_obj)
+            else:
+                TamanhoProduto.objects.create(produto=produto, tamanho=tamanho_unico)
 
             print(f"Produto '{produto.nome}' criado e associado.")
 

@@ -34,7 +34,7 @@ export default function Categorias() {
 
   return (
     <section className="w-full px-6 py-8 bg-[#faf9f6]">
-      <div className="mb-16 w-[90%] max-w-screen-3xl mx-auto text-center">
+      <div className="mb-0 md:mb-8 lg:mb-10 w-[90%] max-w-screen-3xl mx-auto text-center">
         {/* Mobile: 1 coluna */}
         <div className="grid grid-cols-1 gap-4 md:hidden">
           {categorias.map((cat) => (

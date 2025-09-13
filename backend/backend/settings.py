@@ -16,7 +16,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = [f"https://{os.getenv('ADMIN_DOMAIN')}"]
+CSRF_TRUSTED_ORIGINS = [f"https://{os.getenv('ADMIN_DOMAIN')}", f"https://{os.getenv('FRONTEND_DOMAIN')}"]
 
 # Chaves de API
 API_KEY = os.getenv('API_KEY')
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     'core',
     'rest_framework',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -71,12 +72,31 @@ JAZZMIN_UI_TWEAKS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'core.middleware.SubdomainURLConfMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://compilerhub.store",
+    "https://compilerhub.store",
+    "https://api.compilerhub.store",
+    "http://api.compilerhub.store",
+    "http://localhost:5173",
+]
+
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'x-api-key',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 ROOT_URLCONF = 'backend.urls'

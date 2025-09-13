@@ -1,33 +1,33 @@
-import { ChevronUp, Instagram } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import s from "./PreFooter.module.css";
 
 export default function PreFooter() {
-  const sobreNos = [
-    { label: "Nossa História", href: "/sobre-nos#historia" },
-    { label: "Inspiração", href: "/sobre-nos#inspiracao" },
-    { label: "Propósito", href: "/sobre-nos#proposito" },
-    { label: "A Proposta", href: "/sobre-nos#proposta" },
-    { label: "Materiais e Qualidade", href: "/sobre-nos#materiais" },
+  // === COLUNAS (4 x 3 itens) ===
+  const explorar = [
+    { label: "Joias", href: "/joias" },
+    { label: "Personalizados", href: "/criadas-para-voce" },
+    { label: "Eventos", href: "/eventos" },
   ];
 
-  const atendimento = [
-    { label: "Perguntas Frequentes", href: "/ajuda#faq" },
-    { label: "Acompanhe o seu Pedido", href: "/pedido/rastreio" },
-    { label: "Central de Ajuda", href: "/ajuda" },
-    { label: "Horário de Atendimento", href: "/ajuda#horarios" },
+  const descobrir = [
+    { label: "Descubra joias exclusivas", href: "/criadas-para-voce#contato" },
+    { label: "Como funciona o personalizado", href: "/criadas-para-voce#como-funciona" },
+    { label: "Fale Conosco", href: "/contato" },
+  ];
+
+  const sobreNos = [
+    { label: "Sobre Nós", href: "/sobre-nos" },
+    { label: "Nossa Missão", href: "/sobre-nos#missao" },
+    { label: "Nossa História", href: "/sobre-nos#historia" },
+  ];
+
+  const politicasRedes = [
+    { label: "Política de Privacidade", href: "/privacidade" }, // único novo necessário
+    { label: "Instagram", href: "https://instagram.com/roalves_jewellery", external: true },
     { label: "WhatsApp", href: "https://wa.me/55SEUNUMERO", external: true },
   ];
 
-  const informacoes = [
-    { label: "Prazos e Formas de Envio", href: "/envio" },
-    { label: "Consertos e Transformações", href: "/consertos" },
-    { label: "Garantia e Trocas", href: "/garantia" },
-    { label: "Política de Devolução", href: "/devolucao" },
-    { label: "Política de Privacidade", href: "/privacidade" },
-  ];
-
-  const scrollToTop = () =>
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   const LinkList = ({ title, items }) => (
     <div className={s.col}>
@@ -52,32 +52,18 @@ export default function PreFooter() {
       {/* Barra superior com linha + voltar ao topo */}
       <div className={s.topBar}>
         <button className={s.toTopBtn} onClick={scrollToTop}>
-          <span className={s.toTopIcon}>
-            <ChevronUp />
-          </span>
+          <span className={s.toTopIcon}><ChevronUp /></span>
           <span className={s.toTopText}>VOLTAR AO TOPO</span>
         </button>
       </div>
 
-      {/* Grid de colunas + instagram à direita */}
+      {/* Grid 4 colunas equilibradas */}
       <div className={s.wrap}>
         <div className={s.grid}>
-          <LinkList title="Sobre Nós" items={sobreNos} />
-          <LinkList title="Atendimento" items={atendimento} />
-          <LinkList title="Informações" items={informacoes} />
-
-          <a
-            className={s.insta}
-            href="https://instagram.com/roalves_jewellery"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram roalves_jewellery"
-          >
-            <span className={s.instaIcon}>
-              <Instagram />
-            </span>
-            <span className={s.instaHandle}>roalves_jewellery</span>
-          </a>
+          <LinkList title="Explorar" items={explorar} />
+          <LinkList title="Descobrir" items={descobrir} />
+          <LinkList title="Conheça a Marca" items={sobreNos} />
+          <LinkList title="Políticas & Redes" items={politicasRedes} />
         </div>
       </div>
     </section>
