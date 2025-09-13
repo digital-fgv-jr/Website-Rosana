@@ -63,7 +63,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     - GET /produtos/
     - GET /produtos/{id}/
     """
-    queryset = Produto.objects.all()
+    queryset = Produto.objects.all().prefetch_related('categorias')
     serializer_class = ProdutoSerializer
     permission_classes = [HasAPIKey]
 

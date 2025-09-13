@@ -97,13 +97,24 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://compilerhub.store",
-    "https://compilerhub.store",
-    "https://api.compilerhub.store",
-    "http://api.compilerhub.store",
-    "http://localhost:5173",
-]
+def _origins_for(domain: str):
+    if not domain:
+        return []
+    return [f"http://{domain}", f"https://{domain}"]
+
+# Em desenvolvimento, libere tudo para evitar atrito com CORS
+CORS_ALLOW_ALL_ORIGINS = DEBUG is True
+
+# Em produção, restrinja explicitamente usando os domínios configurados
+if not CORS_ALLOW_ALL_ORIGINS:
+    # Inclui o FRONTEND_DOMAIN (pode ter porta, ex.: compilerhub.store:82)
+    _allowed = set()
+    for d in [FRONTEND_DOMAIN, 'localhost:5173', '127.0.0.1:5173', 'compilerhub.store', 'api.compilerhub.store']:
+        for o in _origins_for(d):
+            _allowed.add(o)
+    CORS_ALLOWED_ORIGINS = sorted(_allowed)
+else:
+    CORS_ALLOWED_ORIGINS = []
 
 CORS_ALLOWED_HEADERS = [
     'accept',

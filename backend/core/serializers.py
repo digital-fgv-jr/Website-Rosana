@@ -135,7 +135,10 @@ class InformacoesTransporteSerializer(serializers.Serializer):
     dias_para_disponibilizar = serializers.IntegerField()
 
 class ProdutoSerializer(serializers.ModelSerializer):
-    categoria = CategoriaLiteSerializer(read_only=True)
+    # Categoria principal (primeira) para compatibilidade com o frontend atual
+    categoria = serializers.SerializerMethodField()
+    # Lista completa de categorias do produto
+    categorias = CategoriaLiteSerializer(many=True, read_only=True)
     detalhes = DetalheProdutoSerializer(many=True, read_only=True, source='detalheproduto_set')
     imagens = ImagemProdutoSerializer(many=True, read_only=True, source='imagemproduto_set')
     tamanhos = TamanhoProdutoSerializer(many=True, read_only=True, source='tamanhoproduto_set')
@@ -146,10 +149,16 @@ class ProdutoSerializer(serializers.ModelSerializer):
         model = Produto
         fields = [
             'id', 'nome', 'descricao', 'preco', 'qtd_disponivel',
-            'categoria', 'detalhes', 'imagens', 'tamanhos',
+            'categoria', 'categorias', 'detalhes', 'imagens', 'tamanhos',
             'informacoes_transporte', 'disponivel_para_compra',
         ]
     
+    def get_categoria(self, obj):
+        primeira = obj.categorias.first()
+        if not primeira:
+            return None
+        return CategoriaLiteSerializer(primeira).data
+
     def get_disponivel_para_compra(self, obj):
         return obj.qtd_disponivel > obj.qtd_em_compra
 
