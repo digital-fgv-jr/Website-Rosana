@@ -1,6 +1,7 @@
 # Views v4.4.2
 
 from rest_framework import viewsets, mixins, status
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -62,7 +63,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     - GET /produtos/
     - GET /produtos/{id}/
     """
-    queryset = Produto.objects.all()
+    queryset = Produto.objects.all().prefetch_related('categorias')
     serializer_class = ProdutoSerializer
     permission_classes = [HasAPIKey]
 
@@ -119,7 +120,8 @@ class MercadoPagoWebhookView(APIView):
     Recebe e processa webhooks do Mercado Pago, atualizando o status do pedido
     e realizando o estorno de estoque em caso de falha no pagamento.
     """
-    permission_classes = [HasAPIKey]
+    # Webhooks não devem exigir a API Key do cliente; validar assinatura no futuro
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         notification_id = request.data.get('data', {}).get('id')
@@ -171,7 +173,7 @@ class FrenetWebhookView(APIView):
     Recebe e processa notificações de webhook da Frenet.
     Atualiza o status do pedido com base no status de rastreamento da entrega.
     """
-    permission_classes = [HasAPIKey]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         data = request.data

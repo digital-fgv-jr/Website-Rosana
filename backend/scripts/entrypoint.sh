@@ -4,17 +4,7 @@
 set -e
 
 # 1. Executar as Migrações do Banco de Dados
-
-rm -f /usr/src/app/core/migrations/0001_initial.py
-rm -f /usr/src/app/core/migrations/0002_popular_dados_iniciais.py 
-
 echo "Aplicando migrações do banco de dados..."
-python manage.py makemigrations
-python manage.py migrate --no-input
-python manage.py makemigrations core --empty --name popular_dados_iniciais
-
-
-cp /usr/src/app/core/management/migrations_template/0002_popular_dados_iniciais.py /usr/src/app/core/migrations/0002_popular_dados_iniciais.py 
 python manage.py migrate --no-input
 # 2. Coletar Arquivos Estáticos
 # Embora o build já faça isso, é uma boa prática garantir que esteja atualizado.

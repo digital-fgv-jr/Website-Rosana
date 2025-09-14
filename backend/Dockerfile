@@ -5,15 +5,24 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
+# Dependências do sistema (Pillow, etc.)
+RUN apk add --no-cache \
+    build-base \
+    libjpeg-turbo-dev \
+    zlib-dev \
+    freetype-dev \
+    lcms2-dev \
+    openjpeg-dev \
+    tiff-dev \
+    postgresql-libs
+
+COPY requirements.prod.txt ./requirements.txt
 RUN pip install --no-cache-dir gunicorn -r requirements.txt
 
 COPY . .
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-RUN python manage.py collectstatic --no-input
 
 EXPOSE 8000
 

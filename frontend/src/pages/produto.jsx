@@ -17,6 +17,27 @@ import PreFooter from "../components/PreFooter";
 import WhatsApp from "../components/Atoms/WhatsApp";
 
 /* ========================= Helpers ========================= */
+// Garante que a imagem sempre use a origem do backend, preservando apenas path/query/hash do campo vindo da API
+const backendOrigin = (() => {
+  try {
+    const url = new URL(import.meta.env.VITE_API_URL);
+    return url.origin; // ex.: http://localhost:8000
+  } catch (_e) {
+    try { return window.location.origin; } catch (_e2) { return ""; }
+  }
+})();
+
+const toBackendUrl = (input) => {
+  const placeholder = "/placeholder.svg";
+  if (!input) return placeholder;
+  try {
+    const parsed = new URL(input, backendOrigin || undefined);
+    return `${backendOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch (_e) {
+    const path = String(input).startsWith("/") ? String(input) : `/${String(input)}`;
+    return `${backendOrigin}${path}`;
+  }
+};
 
 // Title Case com suporte a acentos e respeitando números/siglas (ex.: 18K)
 const toTitleCase = (str = "") =>
@@ -280,7 +301,7 @@ export default function Produto() {
 
               <div className="w-full border border-[#c0c0c0] shadow-sm bg-white">
                 <img
-                  src={produto.imagens?.[0]?.imagem}
+                  src={toBackendUrl(produto.imagens?.[0]?.imagem)}
                   alt={produto.nome}
                   className="w-full h-full object-cover"
                 />

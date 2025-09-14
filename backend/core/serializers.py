@@ -23,9 +23,18 @@ from .models import (
 
 ## Propriedades Básicas
 class ImagemSerializer(serializers.ModelSerializer):
+    # Força retorno relativo (ex.: "/media/...") para funcionar em diferentes hosts/portas
+    imagem = serializers.SerializerMethodField()
+
     class Meta:
         model = Imagem
         fields = ['id', 'titulo', 'imagem']
+
+    def get_imagem(self, obj):
+        try:
+            return obj.imagem.url  # normaliza como path relativo a MEDIA_URL
+        except Exception:
+            return None
 
 class TamanhoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -126,7 +135,10 @@ class InformacoesTransporteSerializer(serializers.Serializer):
     dias_para_disponibilizar = serializers.IntegerField()
 
 class ProdutoSerializer(serializers.ModelSerializer):
-    categoria = CategoriaLiteSerializer(read_only=True)
+    # Categoria principal (primeira) para compatibilidade com o frontend atual
+    categoria = serializers.SerializerMethodField()
+    # Lista completa de categorias do produto
+    categorias = CategoriaLiteSerializer(many=True, read_only=True)
     detalhes = DetalheProdutoSerializer(many=True, read_only=True, source='detalheproduto_set')
     imagens = ImagemProdutoSerializer(many=True, read_only=True, source='imagemproduto_set')
     tamanhos = TamanhoProdutoSerializer(many=True, read_only=True, source='tamanhoproduto_set')
@@ -137,10 +149,16 @@ class ProdutoSerializer(serializers.ModelSerializer):
         model = Produto
         fields = [
             'id', 'nome', 'descricao', 'preco', 'qtd_disponivel',
-            'categoria', 'detalhes', 'imagens', 'tamanhos',
+            'categoria', 'categorias', 'detalhes', 'imagens', 'tamanhos',
             'informacoes_transporte', 'disponivel_para_compra',
         ]
     
+    def get_categoria(self, obj):
+        primeira = obj.categorias.first()
+        if not primeira:
+            return None
+        return CategoriaLiteSerializer(primeira).data
+
     def get_disponivel_para_compra(self, obj):
         return obj.qtd_disponivel > obj.qtd_em_compra
 
@@ -248,10 +266,20 @@ class FreteSerializer(serializers.Serializer):
             "SellerCEP": cep_origem, "RecipientCEP": cep_destino_limpo,
             "ShipmentInvoiceValue": float(valor_total_produtos), "ShippingItemArray": items_para_frenet
         }
-        headers_frenet = {"Accept": "application/json", "Content-Type": "application/json", "token": settings.FRENET_TOKEN}
+        token_frenet = getattr(settings, 'FRENET_API_KEY', None) or getattr(settings, 'FRENET_TOKEN', None)
+        api_url_frenet = getattr(settings, 'FRENET_API_URL', None)
+
+        if not token_frenet or not api_url_frenet:
+            raise serializers.ValidationError("Configuração da API de frete ausente: defina FRENET_API_KEY (ou FRENET_TOKEN) e FRENET_API_URL.")
+
+        headers_frenet = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "token": token_frenet,
+        }
 
         try:
-            response_frenet = requests.post(settings.FRENET_API_URL, json=payload_frenet, headers=headers_frenet)
+            response_frenet = requests.post(api_url_frenet, json=payload_frenet, headers=headers_frenet)
             response_frenet.raise_for_status()
             resultado = response_frenet.json()
             opcoes_frete = resultado.get('ShippingServicesArray', [])
