@@ -105,3 +105,60 @@ Se quiser acessar usando os hostnames configurados no Nginx local (porta 82):
   - Admin: `http://admin.compilerhub.store:82`
 
 Observação: a API retorna paths relativos para imagens (`/media/...`) e o frontend monta a URL final usando `VITE_API_URL`. Por isso é essencial definir `VITE_API_URL` com o host/porta corretos (incluindo `:82`).
+
+## Deploy isolado (frontend e backend)
+
+Para simplificar releases independentes, este repositório agora possui scripts e targets que permitem publicar apenas o frontend (nginx) ou apenas o backend, sem reiniciar os demais serviços.
+
+- Pré‑requisito: `docker compose` e um `.env` válido na raiz.
+
+- Build isolado:
+  - `make build-frontend` (imagem do nginx que serve o bundle do Vite)
+  - `make build-backend` (imagem do Django + Gunicorn)
+
+- Deploy isolado (sem rebuild):
+  - `make deploy-frontend` (sobe/aplica somente `nginx` com `--no-deps`)
+  - `make deploy-backend` (sobe/aplica somente `backend` com `--no-deps`)
+
+- Deploy isolado com build no mesmo passo:
+  - `BUILD=1 make deploy-frontend`
+  - `BUILD=1 make deploy-backend`
+
+Notas:
+- O backend já executa migrações e `collectstatic` no entrypoint ao subir o container.
+- O serviço `nginx` serve o frontend estático e expõe as rotas de API/Admin (conforme `nginx/nginx.conf`). Se necessário, você pode publicar apenas o `backend` (ex.: hotfix) sem tocar no `nginx`.
+- Para publicar ambos como antes: `docker compose up -d --build`.
+
+## Deploy em PaaS (Render/Heroku)
+
+Este repo já está preparado para deploys em PaaS com serviços separados.
+
+### Render.com
+
+- Arquivo: `render.yaml` na raiz define dois serviços:
+  - `rosana-backend` (Web Service via Dockerfile `backend/Dockerfile`).
+  - `rosana-frontend` (Static Site buildando `frontend/` e publicando `dist/`).
+- Backend:
+  - Ajuste as variáveis sensíveis no dashboard do Render (as chaves com `sync: false`).
+  - Opcional: aumente o disco `media` caso use uploads.
+- Frontend:
+  - Defina `VITE_API_URL` apontando para a URL do backend Render.
+  - Faça o primeiro deploy via “New +” → “Blueprint” apontando para o repo.
+
+### Heroku (Container Registry)
+
+- Pré‑requisitos: Heroku CLI logado (`heroku login`) e apps criados:
+  - Um app para o backend (ex.: `rosana-backend`)
+  - Um app para o frontend (ex.: `rosana-frontend`)
+- Backend (usa `backend/Dockerfile` e respeita `$PORT`):
+  - `HEROKU_BACKEND_APP=rosana-backend make deploy-heroku-backend`
+- Frontend (usa `frontend/Dockerfile` com Nginx ouvindo `$PORT`):
+  - `HEROKU_FRONTEND_APP=rosana-frontend make deploy-heroku-frontend`
+- Variáveis:
+  - Configure as envs no Heroku Dashboard (mesmo conjunto do `.env`, evitando `VITE_` com segredos).
+  - No frontend, ajuste `VITE_API_URL` para a URL pública do backend.
+
+Notas gerais
+- Backend agora lê a porta do ambiente (`$PORT`), necessário em PaaS.
+- Frontend Nginx também usa `$PORT` via template; localmente segue na porta 80 (mapeada pelo Compose).
+- O Compose com `nginx` continua válido para produção self‑hosted; Render/Heroku usam os serviços desacoplados.

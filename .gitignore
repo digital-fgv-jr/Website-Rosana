@@ -178,6 +178,9 @@ logs
 **/*.back.*
 
 node_modules
+
+# Local env backups
+.env.backup
 bower_components
 
 *.sublime*
