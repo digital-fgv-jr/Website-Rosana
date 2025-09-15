@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { buscarEFormatarProdutos } from "../data/produtos";
-import { buscarEFormatarCategorias } from "../data/categorias";
+import { buscarEFormatarCategorias, mapCategoriaParamToSlug } from "../data/categorias";
 import Header from "../components/Header";
 import HeaderCompact from "../components/HeaderCompact";
 import Footer from "../components/Footer";
@@ -114,15 +114,6 @@ const getMateriaisFromProduto = (p) => {
 /** Categoria do produto (dataset usa { nome_categoria }) */
 const getCategoriaSlugFromProduto = (p) =>
   String(p?.categoria?.nome_categoria || p?.categoria || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-/** Mapeia aliases da URL/UI -> slug real do dataset */
-const mapCategoriaParamToSlug = (param) => {
-  const s = String(param || "").toLowerCase();
-  if (s === "brinco" || s === "brincos") return "brincos";
-  if (s === "colar" || s === "cordao") return "cordao";
-  // os demais já batem
-  return s;
-};
 
 /* ========================= Página ========================= */
 export default function Joias() {

@@ -1,73 +1,45 @@
 import apiClient from '../api';
 
 /**
- * Busca a lista de todos os produtos disponíveis no catálogo.
- * @returns {Promise<AxiosResponse<Array<object>>>} Uma Promessa que resolve para a resposta da API contendo a lista de produtos.
+ * Busca a lista resumida de produtos. Pode ser filtrada por categoria.
+ * @param {object} [filters={}] - Objeto de filtros.
+ * @param {string|null} [filters.categoriaId=null] - O ID da categoria para filtrar os produtos.
+ * @returns {Promise<object>} A resposta da API contendo a lista de produtos.
  * @example
- * // Exemplo da estrutura de um objeto Produto na lista da resposta (`response.data`):
+ * // Exemplo de response.data para getProdutos():
  * [
  * {
- * "id": "uuid-do-produto-aqui",
- * "nome": "Colar de Pérolas Clássico",
- * "descricao": "Um colar atemporal, perfeito para qualquer ocasião.",
- * "preco": "899.90",
- * "qtd_disponivel": 15,
- * "categoria": {
- * "id": "uuid-da-categoria",
- * "nome_categoria": "Colares"
- * },
- * "detalhes": [
- * {
- * "id": "uuid-do-detalhe",
- * "propriedade": "Material",
- * "descricao": "Pérolas de água doce e fecho em Prata 925"
- * }
- * ],
- * "imagens": [
- * {
- * "id": "uuid-da-imagemproduto",
- * "imagem": {
- * "id": "uuid-da-imagem",
- * "titulo": "Colar em destaque",
- * "imagem": "http://seu-site.com/media/images/colar_perolas.webp"
- * }
- * }
- * ],
- * "tamanhos": [
- * {
- * "id": "uuid-do-tamanhoproduto",
- * "tamanho": {
- * "id": "uuid-do-tamanho",
- * "nome": "Comprimento",
- * "valor": "45"
- * }
- * }
- * ],
- * "informacoes_transporte": {
- * "peso": "0.15",
- * "comprimento": "20.00",
- * "largura": "15.00",
- * "altura": "5.00",
- * "dias_para_disponibilizar": 2
- * },
- * "disponivel_para_compra": true
+ * "id": "uuid-do-produto-1",
+ * "nome": "Anel Solitário de Prata",
+ * "preco": "250.00",
+ * "categorias": [ { "id": "uuid-da-categoria-1", "nome_categoria": "Anel" } ],
+ * "primeira_imagem": "http://127.0.0.1:8000/media/images/anel_solitario.webp"
  * }
  * ]
  */
-export const getProdutos = () => {
-  // GET /api/produtos/
-  return apiClient.get('/produtos/');
+export const getProdutos = ({ categoriaId = null } = {}) => {
+  let url = '/produtos/';
+  if (categoriaId) {
+    // A API espera o filtro no formato `?categorias__id=`
+    url += `?categorias__id=${categoriaId}`;
+  }
+  return apiClient.get(url);
 };
 
 /**
- * Busca os detalhes completos de um produto específico pelo seu ID (UUID).
+ * Busca os detalhes completos de um produto específico pelo seu ID.
  * @param {string} id - O ID (UUID) do produto.
- * @returns {Promise<AxiosResponse<object>>} Uma Promessa que resolve para a resposta da API com os detalhes do produto.
+ * @returns {Promise<object>} A resposta da API contendo os dados detalhados do produto.
  * @example
- * // A estrutura da resposta (`response.data`) é um único objeto
- * // idêntico ao do exemplo da função getProdutos.
+ * // Exemplo de response.data:
+ * {
+ * "id": "uuid-do-produto-1",
+ * "nome": "Anel Solitário de Prata",
+ * "descricao": "Um anel elegante feito em prata 925 com uma zircônia central.",
+ * "preco": "250.00",
+ * // ... e todos os outros campos detalhados (imagens, detalhes, tamanhos, etc.)
+ * }
  */
-export const getProdutoById = id => {
-  // GET /api/produtos/{id}/
+export const getProdutoById = (id) => {
   return apiClient.get(`/produtos/${id}/`);
 };

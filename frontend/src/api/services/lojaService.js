@@ -1,56 +1,48 @@
 import apiClient from '../api';
 
 /**
- * Busca a lista de todas as lojas disponíveis.
- * @returns {Promise<AxiosResponse<Array<object>>>} Uma Promessa que resolve para a resposta da API contendo a lista de lojas.
+ * Busca a lista de todas as lojas com suas informações públicas.
+ * @returns {Promise<object>} A resposta da API contendo a lista de lojas.
  * @example
- * // Exemplo de como a resposta (`response.data`) será estruturada:
+ * // Exemplo de response.data:
  * [
  * {
- * "id": "uuid-da-loja-1",
- * "apelido": "Joalheria Central",
- * "endereco": [
+ * "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+ * "apelido": "Rô Alves Jewellery",
+ * "contato_loja": {
+ * "contato": {
+ * "nome": "Rô Alves",
+ * "sobrenome": "Jewellery",
+ * "cpf": "123.456.789-00",
+ * "email": "contato@jewellery.roalves.com.br",
+ * "whatsapp": "(21) 99999-9999"
+ * },
+ * "instagram": "@roalves_jewellery",
+ * "cnpj": "14.946.698/0001-47"
+ * },
+ * "enderecos": [
  * {
- * "id": "uuid-do-endereco-1",
  * "cep": "22231-020",
- * "logradouro": "Rua Principal",
- * "numero": 100,
- * "complemento": null,
- * "bairro": "Centro",
+ * "logradouro": "Rua Farani",
+ * "numero": 3,
+ * "complemento": "Apto 101",
+ * "bairro": "Botafogo",
  * "cidade": "Rio de Janeiro",
  * "uf": "RJ"
  * }
- * ],
- * "contatoloja": {
- * "contato": {
- * "id": "uuid-do-contato-1",
- * "nome": "Carlos",
- * "sobrenome": "Ribeiro",
- * "cpf": "11122233344",
- * "email": "contato@joalheriacentral.com"
- * },
- * "whatsapp": "(21) 99999-8888",
- * "telefone": "(21) 2222-3333",
- * "instagram": "@joalheriacentral",
- * "cnpj": "11.222.333/0001-44"
- * }
+ * ]
  * }
  * ]
  */
 export const getLojas = () => {
-  // GET /api/lojas/
   return apiClient.get('/lojas/');
 };
 
 /**
  * Busca os detalhes de uma loja específica pelo seu ID.
- * Nota: Para buscar o catálogo de produtos da loja, use a função getCategoriasByIdLoja.
  * @param {string} id - O ID (UUID) da loja.
- * @returns {Promise<AxiosResponse<object>>} Uma Promessa que resolve para a resposta da API com os detalhes da loja.
- * @example
- * // A resposta (`response.data`) terá a mesma estrutura de um objeto da lista acima.
+ * @returns {Promise<object>} A resposta da API contendo os dados da loja.
  */
-export const getLojaById = id => {
-  // GET /api/lojas/{id}/
+export const getLojaById = (id) => {
   return apiClient.get(`/lojas/${id}/`);
 };

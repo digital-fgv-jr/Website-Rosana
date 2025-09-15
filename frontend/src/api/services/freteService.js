@@ -1,40 +1,32 @@
 import apiClient from '../api';
 
 /**
- * Calcula o frete para uma lista de itens e um CEP de destino.
- * @param {string} cepDestino - O CEP do cliente (ex: "22231-020").
- * @param {Array<{tamanho_id: string, quantidade: number}>} itens - A lista de itens a serem cotados. O 'tamanho_id' deve ser o UUID do TamanhoProduto.
- * @returns {Promise<AxiosResponse<Array<object>>>} Uma Promessa que resolve para a resposta da API com as opções de frete.
- * * @example
- * // Exemplo de 'itens' a serem enviados:
- * const itensParaCotar = [
- * { tamanho_id: "a1b2c3d4-...", quantidade: 1 },
- * { tamanho_id: "e5f6g7h8-...", quantidade: 2 }
- * ];
- * * * @example
- * // Exemplo de como a resposta (`response.data`) será estruturada:
+ * Calcula as opções de frete para um produto e CEP de destino.
+ * @param {object} data - Objeto com os dados para a cotação.
+ * @param {string} data.produtoId - O ID (UUID) do produto.
+ * @param {string} data.cepDestino - O CEP de destino (ex: "01311-000").
+ * @returns {Promise<object>} A resposta da API com a lista de opções de frete da Melhor Envio.
+ * @example
+ * // Exemplo de request payload:
+ * {
+ * "produto_id": "uuid-do-produto-1",
+ * "cep_destino": "01311-000"
+ * }
+ * * // Exemplo de response.data:
  * [
  * {
- * "transportadora": "SEDEX",
- * "codigo_servico": "03220",
- * "preco_frete": "28.50",
- * "prazo_entrega_dias": 8,
- * "data_entrega_estimada": "2025-09-20"
- * },
- * {
- * "transportadora": "PAC",
- * "codigo_servico": "03298",
- * "preco_frete": "19.90",
- * "prazo_entrega_dias": 12,
- * "data_entrega_estimada": "2025-09-24"
+ * "id": 1,
+ * "name": "PAC",
+ * "price": "21.50",
+ * "delivery_time": 8,
+ * "company": { "id": 1, "name": "Correios", "picture": "..." }
  * }
  * ]
  */
-export const cotarFrete = (cepDestino, itens) => {
+export const cotarFrete = ({ produtoId, cepDestino }) => {
   const payload = {
+    produto_id: produtoId,
     cep_destino: cepDestino,
-    itens: itens,
   };
-  // POST /api/cotar-frete/
   return apiClient.post('/cotar-frete/', payload);
 };

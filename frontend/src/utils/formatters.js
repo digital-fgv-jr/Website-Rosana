@@ -1,25 +1,15 @@
-/**
- * Pega um objeto de produto complexo da API e o transforma em um formato
- * mais simples e direto para uso nos componentes do frontend.
- * @param {object} produtoDaApi - O objeto de produto vindo do seu ProdutoSerializer.
- * @returns {object} Um objeto de produto formatado.
- */
 // Normaliza URLs de imagens vindas do backend para o ambiente atual (dev/prod)
-const API_BASE = (import.meta?.env?.VITE_API_URL || '').replace(/\/+$/, '');
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 const PLACEHOLDER = '/placeholder.svg';
 
 function normalizeImageUrl(url) {
   if (!url) return PLACEHOLDER;
   try {
-    const base = API_BASE ? new URL(API_BASE) : null;
-    const parsed = new URL(url, base || window.location.origin);
-    // Se temos uma base de API definida e o host do URL não bater, reescreve para a base mantendo o caminho
-    if (base && parsed.origin !== base.origin) {
-      return new URL(parsed.pathname + parsed.search + parsed.hash, base).toString();
-    }
+    // Tenta criar uma URL absoluta. Se a base for um caminho relativo, usa a origem da janela.
+    const base = API_BASE.startsWith('http') ? new URL(API_BASE) : new URL(window.location.origin);
+    const parsed = new URL(url, base);
     return parsed.toString();
   } catch (_e) {
-    // Se for path relativo, prefixa com a base
     if (API_BASE && String(url).startsWith('/')) {
       return API_BASE + url;
     }
@@ -27,12 +17,19 @@ function normalizeImageUrl(url) {
   }
 }
 
+/**
+ * Pega um objeto de produto da API (seja da lista ou do detalhe) e o transforma 
+ * em um formato padronizado para uso nos componentes do frontend.
+ * @param {object} produtoDaApi - O objeto de produto vindo do backend.
+ * @returns {object} Um objeto de produto formatado.
+ */
 export const formatarProdutoParaFrontend = (produtoDaApi) => {
   if (!produtoDaApi) return null;
 
-  // Pega a primeira imagem ou um placeholder
+  // Lógica aprimorada para imagem:
+  // Prioriza 'primeira_imagem' (da lista) ou a primeira de 'imagens' (do detalhe).
   const imagemPrincipal = normalizeImageUrl(
-    produtoDaApi.imagens?.[0]?.imagem?.imagem
+    produtoDaApi.primeira_imagem || produtoDaApi.imagens?.[0]?.imagem
   );
 
   // Formata o preço para o padrão brasileiro
@@ -42,34 +39,35 @@ export const formatarProdutoParaFrontend = (produtoDaApi) => {
   return {
     id: produtoDaApi.id,
     nome: produtoDaApi.nome,
-    descricao: produtoDaApi.descricao,
     preco: precoFormatado,
-    qtd_disponivel: produtoDaApi.qtd_disponivel,
-    // Campo auxiliar usado pela página de Joias para exibir a miniatura
+    categorias: produtoDaApi.categorias || [],
+
+    // Campo auxiliar usado pelos cards de produto na lista
     __thumb: imagemPrincipal,
-    // Alias opcional para usos futuros
-    __image: imagemPrincipal,
-    // Pega o nome da categoria do objeto aninhado
-    categoria: { 
-      nome_categoria: produtoDaApi.categoria?.nome_categoria?.toLowerCase() || 'sem-categoria' 
-    },
-    // Extrai e simplifica a lista de imagens
-    imagens: produtoDaApi.imagens.map(img => ({ imagem: normalizeImageUrl(img.imagem?.imagem) })),
-    // Extrai e simplifica a lista de tamanhos
-    tamanho: produtoDaApi.tamanhos.map(t => ({
+
+    // --- Campos que podem ou não existir (só vêm na versão de detalhe) ---
+    // Usamos '|| []' ou '|| 0' como fallback para evitar erros.
+    descricao: produtoDaApi.descricao || '',
+    qtd_disponivel: produtoDaApi.qtd_disponivel || 0,
+    
+    imagens: (produtoDaApi.imagens || []).map(img => ({ 
+      imagem: normalizeImageUrl(img.imagem) 
+    })),
+    
+    tamanhos: (produtoDaApi.tamanhos || []).map(t => ({
       id: t.id,
       nome: `${t.tamanho.nome} ${t.tamanho.valor}`,
       valor: t.tamanho.valor
     })),
-    // Extrai e simplifica a lista de detalhes
-    detalhes: produtoDaApi.detalhes.map(d => ({
+    
+    detalhes: (produtoDaApi.detalhes || []).map(d => ({
       propriedade: d.propriedade,
       descricao: d.descricao
     })),
-    // Pega as informações de transporte do objeto aninhado
-    peso: produtoDaApi.informacoes_transporte?.peso,
-    comprimento: produtoDaApi.informacoes_transporte?.comprimento,
-    largura: produtoDaApi.informacoes_transporte?.largura,
-    altura: produtoDaApi.informacoes_transporte?.altura,
+    
+    peso: produtoDaApi.peso,
+    comprimento: produtoDaApi.comprimento,
+    largura: produtoDaApi.largura,
+    altura: produtoDaApi.altura,
   };
 };
