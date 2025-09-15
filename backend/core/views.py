@@ -1,8 +1,7 @@
-# Views v6.1.0
+# Views v6.3.0
 
 from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 
 from .models import Loja, Categoria, Produto, Pedido
 from .serializers import (
@@ -14,6 +13,8 @@ from .serializers import (
     PedidoCreateSerializer,
     PedidoReadOnlySerializer,
 )
+
+from .permissions import HasAPIKey
 
 #======================================================================
 # ViewSets para Recursos Padrão
@@ -27,7 +28,7 @@ class LojaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Loja.objects.prefetch_related('endereco_set').select_related('contatoloja__contato').all()
     serializer_class = LojaPublicSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [HasAPIKey]
     lookup_field = 'id'
 
 class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
@@ -38,7 +39,7 @@ class CategoriaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Categoria.objects.select_related('loja').prefetch_related('imagens').all()
     serializer_class = CategoriaListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [HasAPIKey]
     lookup_field = 'id'
 
 class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
@@ -50,7 +51,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Produto.objects.prefetch_related(
         'categorias', 'imagens', 'detalheproduto_set', 'tamanhoproduto_set__tamanho'
     ).all()
-    permission_classes = [AllowAny]
+    permission_classes = [HasAPIKey]
     lookup_field = 'id'
 
     def get_serializer_class(self):
@@ -67,7 +68,7 @@ class ProdutoViewSet(viewsets.ReadOnlyModelViewSet):
 class CotarFreteView(generics.GenericAPIView):
     """ View para receber um CEP e ID do produto e retornar as opções de frete. """
     serializer_class = FreteQuoteSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [HasAPIKey]
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -76,7 +77,7 @@ class CotarFreteView(generics.GenericAPIView):
 class PedidoCreateView(generics.CreateAPIView):
     """ View para criar um novo pedido. """
     serializer_class = PedidoCreateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [HasAPIKey]
     queryset = Pedido.objects.none()
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
