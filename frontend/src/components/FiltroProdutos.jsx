@@ -1,17 +1,14 @@
 // components/FiltroProdutos.jsx
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import MaterialMultiSelect from "./MaterialMultiSelect";
 
 export default function FiltroProdutos({
   open,
   onClose,
   onApply,
   onResetAll,
-  materiaisDisponiveis = [],
   initial = {},
 }) {
-  const [materiaisSel, setMateriaisSel] = useState(initial.materiaisSel || []);
   const [precoMin, setPrecoMin] = useState(initial.precoMin ?? "");
   const [precoMax, setPrecoMax] = useState(initial.precoMax ?? "");
   const [pesoMin, setPesoMin]   = useState(initial.pesoMin ?? "");
@@ -19,7 +16,6 @@ export default function FiltroProdutos({
 
   useEffect(() => {
     if (open) {
-      setMateriaisSel(initial.materiaisSel || []);
       setPrecoMin(initial.precoMin ?? "");
       setPrecoMax(initial.precoMax ?? "");
       setPesoMin(initial.pesoMin ?? "");
@@ -45,16 +41,15 @@ export default function FiltroProdutos({
 
   const aplicar = () => {
     if (hasAnyError) return;
-    onApply?.({ materiaisSel, precoMin, precoMax, pesoMin, pesoMax });
+    onApply?.({ precoMin, precoMax, pesoMin, pesoMax });
     onClose?.();
   };
 
   const limpar = () => {
-    setMateriaisSel([]);
     setPrecoMin(""); setPrecoMax("");
     setPesoMin(""); setPesoMax("");
 
-    onApply?.({ materiaisSel: [], precoMin: "", precoMax: "", pesoMin: "", pesoMax: "" });
+    onApply?.({ precoMin: "", precoMax: "", pesoMin: "", pesoMax: "" });
     onResetAll?.(); // volta para "Ver tudo" no pai
     onClose?.();
   };
@@ -70,15 +65,6 @@ export default function FiltroProdutos({
           <button onClick={onClose} className="p-2 rounded hover:bg-[#faf9f6]" aria-label="Fechar filtros">
             <X className="w-5 h-5 text-[#1c2c3c]" />
           </button>
-        </div>
-
-        {/* MATERIAIS (dropdown multi-select dinâmico) */}
-        <div className="mb-6">
-          <MaterialMultiSelect
-            options={materiaisDisponiveis}
-            value={materiaisSel}
-            onChange={setMateriaisSel}
-          />
         </div>
 
         {/* PREÇO */}

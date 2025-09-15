@@ -3,36 +3,55 @@ import { useNavigate } from "react-router-dom";
 export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho }) {
   const navigate = useNavigate();
 
-  if (!carrinho?.length) return null;
+  // Sem itens, não mostra
+  if (!Array.isArray(carrinho) || !carrinho.length) return null;
 
-  const itensValidos = carrinho.filter((i) => (i?.quantidade ?? 0) > 0);
+  const itensValidos = carrinho.filter((i) => Number(i?.quantidade) > 0);
 
   const total = itensValidos.reduce(
-    (acc, item) => acc + Number(item.preco_num || item.preco || 0) * Number(item.quantidade || 1),
+    (acc, item) =>
+      acc +
+      Number(item.preco_num ?? item.preco ?? 0) * Number(item.quantidade ?? 1),
     0
   );
 
   const formatBRL = (n) =>
-    Number(n || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    Number(n || 0).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+  const handleFechar = () => {
+    if (typeof fechar === "function") fechar();
+  };
+
+  const handleIrParaCarrinho = () => {
+    // Se o pai passou a callback, usa; senão, navega localmente
+    if (typeof irParaCarrinho === "function") {
+      irParaCarrinho();
+    } else {
+      handleFechar();
+      navigate("/carrinho");
+    }
+  };
 
   function finalizarCompra() {
-    // Normaliza para o checkout (Wallet/Preference)
     const items = itensValidos.map((i) => ({
-      id: i.id || i.sku || i.slug, // opcional
+      id: i.id || i.sku || i.slug,
       title: i.nome,
-      unit_price: Number(i.preco_num || i.preco || 0),
-      quantity: Number(i.quantidade || 1),
+      unit_price: Number(i.preco_num ?? i.preco ?? 0),
+      quantity: Number(i.quantidade ?? 1),
       picture_url: i.imagem || i.foto || i.picture_url || "",
     }));
 
     localStorage.setItem("cart", JSON.stringify(items));
-    if (typeof fechar === "function") fechar();
+    handleFechar();
     navigate("/checkout");
   }
 
   return (
     <div
-      className="fixed top-20 right-5 w-80 bg-white shadow-xl rounded-lg p-4 z-[70] border border-[#c2b280]/30"
+      className="fixed top-20 right-5 w-80 bg-white shadow-xl rounded-lg p-4 z-[9999] border border-[#c2b280]/30"
       role="dialog"
       aria-label="Mini carrinho"
     >
@@ -41,8 +60,12 @@ export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho }) {
       <ul className="divide-y divide-gray-200">
         {itensValidos.map((item, idx) => (
           <li key={idx} className="flex justify-between py-2">
-            <span className="font-MontserratRegular text-[#1c2c3c]">{item.nome}</span>
-            <span className="font-MontserratRegular text-gray-700">{item.quantidade}x</span>
+            <span className="font-MontserratRegular text-[#1c2c3c]">
+              {item.nome}
+            </span>
+            <span className="font-MontserratRegular text-gray-700">
+              {item.quantidade}x
+            </span>
           </li>
         ))}
       </ul>
@@ -52,20 +75,23 @@ export default function MiniCarrinho({ carrinho, fechar, irParaCarrinho }) {
       </p>
 
       <button
-        onClick={fechar}
+        type="button"
+        onClick={handleFechar}
         className="mt-4 px-4 py-2 bg-[#1c2c3c] text-white rounded w-full font-MontserratRegular hover:bg-[#25384d] transition"
       >
         Fechar
       </button>
 
       <button
-        onClick={irParaCarrinho}
+        type="button"
+        onClick={handleIrParaCarrinho}
         className="mt-2 px-4 py-2 bg-[#1c2c3c] text-white rounded w-full font-MontserratRegular hover:bg-[#25384d] transition"
       >
         Ir para o carrinho
       </button>
 
       <button
+        type="button"
         onClick={finalizarCompra}
         className="mt-2 px-4 py-2 bg-[#1c2c3c] text-white rounded w-full font-MontserratRegular hover:bg-[#25384d] transition"
       >
