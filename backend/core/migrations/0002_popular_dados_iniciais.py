@@ -14,8 +14,8 @@ def popular_dados(apps, schema_editor):
     DetalheProduto = apps.get_model('core', 'DetalheProduto')
     Tamanho = apps.get_model('core', 'Tamanho')
     TamanhoProduto = apps.get_model('core', 'TamanhoProduto')
-    Imagem = apps.get_model('core', 'Imagem')
     ImagemProduto = apps.get_model('core', 'ImagemProduto')
+    ImagemCategoria = apps.get_model('core', 'ImagemCategoria')
 
     print("\nCriando dados da loja...")
 
@@ -55,10 +55,9 @@ def popular_dados(apps, schema_editor):
     print("Dados da loja criados com sucesso.")
 
     print("Criando categorias pré-definidas...")
-
-    categorias_predefinidas = ['Anéis', 'Brincos', 'Colares', 'Pingentes', 'Braceletes', 'Filigrana',]
-    for nome_cat in categorias_predefinidas:
-        Categoria.objects.get_or_create(loja=loja, nome_categoria=nome_cat)
+    categorias_predefinidas = [('Anel', 'Anéis',), ('Brinco', 'Brincos',), ('Colar', 'Colares',), ('Pingente', 'Pingentes'), ('Bracelete', 'Braceletes',), ('Filigrana', 'Filigrana',),]
+    for nome_cat, nome_plural in categorias_predefinidas:
+        Categoria.objects.get_or_create(loja=loja, nome_categoria=nome_cat, nome_plural=nome_plural)
     print("Categorias criadas com sucesso.")
 
     print("Criando tamanhos pré-definidos...")
@@ -73,7 +72,6 @@ def popular_dados(apps, schema_editor):
         tamanhos_braceletes[val], _ = Tamanho.objects.get_or_create(nome="Bracelete", valor=val)
     tamanho_unico, _ = Tamanho.objects.get_or_create(nome="Único", valor="UNICO")
     print("Tamanhos criados com sucesso.")
-
 
     print("Iniciando a importação de produtos do CSV...")
     data_dir = os.path.join(settings.BASE_DIR, 'core', 'management', 'initial_data', 'JOIAS_BACKUP')
@@ -104,11 +102,10 @@ def popular_dados(apps, schema_editor):
             if not created:
                 print(f"Produto '{row['Nome']}' já existia. Pulando.")
                 continue
-
             
             categorias_nomes = [cat.strip() for cat in row['Categoria'].split(',') if cat.strip()]
             if categorias_nomes:
-                categorias_para_associar = Categoria.objects.filter(loja=loja, nome_categoria__in=categorias_nomes)
+                categorias_para_associar = Categoria.objects.filter(loja=loja, nome_plural__in=categorias_nomes)
                 if categorias_para_associar.exists():
                     produto.categorias.set(categorias_para_associar)
 
@@ -124,9 +121,11 @@ def popular_dados(apps, schema_editor):
                     print(f"Attempting to load {caminho_imagem}")
                     try:
                         with open(caminho_imagem, 'rb') as f:
-                            imagem_obj = Imagem(titulo=f"{produto.nome} - {nome_imagem}")
-                            imagem_obj.imagem.save(nome_imagem, File(f), save=True)
-                            ImagemProduto.objects.create(imagem=imagem_obj, produto=produto)
+                            ImagemProduto.objects.create(
+                                produto=produto,
+                                titulo=f"{produto.nome} - {nome_imagem}",
+                                imagem=File(f, name=nome_imagem) 
+                            )
                             print(f"Successfully saved {nome_imagem}")
                     except Exception as e:
                         print(f"Error processing {nome_imagem}: {e}")
@@ -145,41 +144,72 @@ def popular_dados(apps, schema_editor):
 
             print(f"Produto '{produto.nome}' criado e associado.")
 
+    print("\nAssociando a primeira imagem de produto a cada categoria...")
+    todas_categorias = Categoria.objects.filter(loja=loja)
+    for categoria in todas_categorias:
+        produto_com_imagem = Produto.objects.filter(categorias=categoria, imagens__isnull=False).last()
+        
+        if produto_com_imagem:
+            primeira_imagem_produto = produto_com_imagem.imagens.first()
+            ImagemCategoria.objects.get_or_create(
+                categoria=categoria,
+                defaults={
+                    'titulo': f"Imagem da categoria {categoria.nome_categoria}",
+                    'imagem': primeira_imagem_produto.imagem
+                }
+            )
+            print(f"Imagem associada para a categoria '{categoria.nome_categoria}'.")
+        else:
+            print(f"Nenhuma imagem encontrada para produtos da categoria '{categoria.nome_categoria}'.")
+    print("Associação de imagens de categoria finalizada.")
+
     print("Importação de produtos finalizada.")
 
 def remover_dados(apps, schema_editor):
-    Loja = apps.get_model('core', 'Loja')
-    ContatoLoja = apps.get_model('core', 'ContatoLoja')
-    Contato = apps.get_model('core', 'Contato')
-    Endereco = apps.get_model('core', 'Endereco')
-    Categoria = apps.get_model('core', 'Categoria')
-    Produto = apps.get_model('core', 'Produto')
-    DetalheProduto = apps.get_model('core', 'DetalheProduto')
-    TamanhoProduto = apps.get_model('core', 'TamanhoProduto')
-    ImagemProduto = apps.get_model('core', 'ImagemProduto')
-    Tamanho = apps.get_model('core', 'Tamanho')
-    Imagem = apps.get_model('core', 'Imagem')
-    ItemPedido = apps.get_model('core', 'ItemPedido')
-    Pedido = apps.get_model('core', 'Pedido')
-    InformacoesEntrega = apps.get_model('core', 'InformacoesEntrega')
     
     print("\nRevertendo migração: Removendo dados iniciais...")
 
-    Endereco.objects.filter(loja_id__isnull=False).exclude(loja_id__in=Loja.objects.values('id')).delete()
-
-    InformacoesEntrega.objects.all().delete()
+    ItemPedido = apps.get_model('core', 'ItemPedido')
     ItemPedido.objects.all().delete()
+    
+    Pedido = apps.get_model('core', 'Pedido')
     Pedido.objects.all().delete()
+    
+    InformacoesEntrega = apps.get_model('core', 'InformacoesEntrega')
+    InformacoesEntrega.objects.all().delete()
+
+    ImagemProduto = apps.get_model('core', 'ImagemProduto')
     ImagemProduto.objects.all().delete()
+
+    ImagemCategoria = apps.get_model('core', 'ImagemCategoria')
+    ImagemCategoria.objects.all().delete()
+
+    TamanhoProduto = apps.get_model('core', 'TamanhoProduto')
     TamanhoProduto.objects.all().delete()
+
+    DetalheProduto = apps.get_model('core', 'DetalheProduto')
     DetalheProduto.objects.all().delete()
+
+    Produto = apps.get_model('core', 'Produto')
+    Produto.categorias.through.objects.all().delete()
     Produto.objects.all().delete()
-    ContatoLoja.objects.all().delete()
-    Endereco.objects.all().delete()
+
+    Categoria = apps.get_model('core', 'Categoria')
     Categoria.objects.all().delete()
-    Tamanho.objects.all().delete()
-    Imagem.objects.all().delete()
+
+    ContatoLoja = apps.get_model('core', 'ContatoLoja')
+    ContatoLoja.objects.all().delete()
+
+    Contato = apps.get_model('core', 'Contato')
     Contato.objects.all().delete()
+
+    Endereco = apps.get_model('core', 'Endereco')
+    Endereco.objects.all().delete()
+
+    Tamanho = apps.get_model('core', 'Tamanho')
+    Tamanho.objects.all().delete()
+    
+    Loja = apps.get_model('core', 'Loja')
     Loja.objects.all().delete()
     
     print("Dados iniciais removidos com sucesso.")

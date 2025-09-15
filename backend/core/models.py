@@ -1,4 +1,4 @@
-# Database v14.13.1
+# Database v15.5.0
 import uuid
 from io import BytesIO
 from PIL import Image as PILImage
@@ -184,6 +184,7 @@ class ContatoDeLoja(Contato):
 class Categoria(BaseModel):
     loja = models.ForeignKey(Loja, on_delete=models.CASCADE)
     nome_categoria = models.CharField(max_length=64, verbose_name='Nome da Categoria')
+    nome_plural = models.CharField(max_length=64, verbose_name='Nome da Categoria (Plural)')
 
     def __str__(self):
         return f'{self.nome_categoria}'
@@ -325,6 +326,7 @@ class Imagem(BaseModel):
     class Meta:
         verbose_name = 'Imagem'
         verbose_name_plural = 'Imagens'
+        abstract = True
 
     def save(self, *args, **kwargs):
 
@@ -373,11 +375,16 @@ class Imagem(BaseModel):
                 default_storage.delete(self.imagem.name)
         super().delete(*args, **kwargs)
 
-class ImagemProduto(BaseModel):
-    imagem = models.ForeignKey(Imagem, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+class ImagemProduto(Imagem):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE, related_name='imagens')
 
     class Meta:
-        unique_together = ('imagem', 'produto')
         verbose_name = 'Imagem do Produto'
         verbose_name_plural = 'Imagens dos Produtos'
+
+class ImagemCategoria(Imagem):
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='imagens')
+
+    class Meta:
+        verbose_name = 'Imagem da Categoria'
+        verbose_name_plural = 'Imagens das Categorias'

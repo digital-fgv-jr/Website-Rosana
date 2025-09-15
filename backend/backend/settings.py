@@ -21,7 +21,7 @@ CSRF_TRUSTED_ORIGINS = [f"https://{os.getenv('ADMIN_DOMAIN')}", f"https://{os.ge
 # Chaves de API
 API_KEY = os.getenv('API_KEY')
 MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN')
-FRENET_API_KEY = os.getenv('FRENET_API_KEY')
+FRENET_TOKEN = os.getenv('FRENET_TOKEN')
 
 # PSQL
 POSTGRES_DB = os.getenv('POSTGRES_DB')
