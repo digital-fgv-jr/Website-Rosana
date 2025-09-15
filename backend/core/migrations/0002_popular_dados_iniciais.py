@@ -24,7 +24,8 @@ def popular_dados(apps, schema_editor):
         defaults={
             'nome': 'Rô Alves',
             'sobrenome': 'Jewellery',
-            'cpf': '82734723026'
+            'cpf': '827.347.230-26',
+            'whatsapp': '(11) 99999-9999',
         }
     )
     
@@ -46,8 +47,6 @@ def popular_dados(apps, schema_editor):
         loja=loja,
         defaults={
             'contato': contato_base_loja,
-            'whatsapp': '(21) 99999-9999',
-            'telefone': '(21) 88888-8888',
             'instagram': '@roalves_jewellery',
             'cnpj': '14.946.698/0001-47'
         }

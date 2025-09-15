@@ -1,8 +1,10 @@
-# Admin v13.12.3
+# Admin v13.13.10
 
 from django.contrib import admin
 from django.utils.html import format_html
 from django import forms
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from .models import (
     Endereco, Contato, ContatoLoja, ContatoNormal, ContatoDeLoja,
@@ -10,36 +12,51 @@ from .models import (
     Tamanho, TamanhoProduto, Pedido, ItemPedido, ImagemProduto, ImagemCategoria,
 )
 
-## INLINES ##
 
-class ContatoLojaInline(admin.StackedInline):
-    model = ContatoLoja
-    can_delete = False
-    min_num = 1
-    max_num = 1
-
-class ContatoLojaInlineForm(forms.ModelForm):
-    nome = forms.CharField(label='Nome', max_length=64)
+## FORMS ##
+class ContatoLojaAdminForm(forms.ModelForm):
+    nome = forms.CharField(label='Nome do Contato', max_length=64)
     sobrenome = forms.CharField(label='Sobrenome', max_length=128, required=False)
-    cpf = forms.CharField(label='CPF', max_length=11)
+    cpf = forms.CharField(label='CPF', max_length=14)
     email = forms.EmailField(label='E-mail', max_length=128)
+    whatsapp = forms.CharField(label='WhatsApp', max_length=15)
 
     class Meta:
         model = ContatoLoja
-        fields = ['nome', 'sobrenome', 'cpf', 'email', 'whatsapp', 'telefone', 'instagram', 'cnpj']
+        fields = ['instagram', 'cnpj']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk and hasattr(self.instance, 'contato'):
+        if self.instance and hasattr(self.instance, 'contato'):
             contato = self.instance.contato
             self.initial['nome'] = contato.nome
             self.initial['sobrenome'] = contato.sobrenome
             self.initial['cpf'] = contato.cpf
             self.initial['email'] = contato.email
+            self.initial['whatsapp'] = contato.whatsapp
+    
+    def save(self, commit=True):
+        contato_data = {
+            'nome': self.cleaned_data['nome'],
+            'sobrenome': self.cleaned_data['sobrenome'],
+            'cpf': self.cleaned_data['cpf'],
+            'email': self.cleaned_data['email'],
+            'whatsapp': self.cleaned_data['whatsapp'],
+        }
+        if self.instance.pk and hasattr(self.instance, 'contato'):
+            Contato.objects.filter(pk=self.instance.contato.pk).update(**contato_data)
+            self.instance.contato.refresh_from_db()
+        else:
+            contato = Contato.objects.create(**contato_data)
+            self.instance.contato = contato
+
+        return super().save(commit=commit)
+
+## INLINES ##
 
 class ContatoLojaAdminInline(admin.StackedInline):
     model = ContatoLoja
-    form = ContatoLojaInlineForm
+    form = ContatoLojaAdminForm
     can_delete = False
     min_num = 1
     max_num = 1
@@ -85,8 +102,9 @@ class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
     verbose_name_plural = 'Itens do Pedido'
     
-    readonly_fields = ('produto', 'tamanho', 'quantidade', 'preco_unitario_congelado', 'subtotal')
-    
+    readonly_fields = ('link_para_produto', 'tamanho', 'quantidade', 'preco_unitario_congelado', 'subtotal')
+    fields = ('link_para_produto', 'tamanho', 'quantidade', 'preco_unitario_congelado', 'subtotal')
+
     can_delete = False
     extra = 0
     def has_add_permission(self, request, obj=None):
@@ -98,6 +116,11 @@ class ItemPedidoInline(admin.TabularInline):
     def subtotal(self, obj):
         resultado = obj.quantidade * obj.preco_unitario_congelado
         return f"R$ {resultado:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    
+    @admin.display(description='Produto')
+    def link_para_produto(self, instance):
+        url = reverse("admin:core_produto_change", args=[instance.produto.pk])
+        return mark_safe(f'<a href="{url}">{instance.produto.nome}</a>')
 
 ## ADMIN MODELS ##
 
@@ -119,8 +142,8 @@ class Enderecos(admin.ModelAdmin):
 
 @admin.register(ContatoNormal)
 class ContatoNormais(admin.ModelAdmin):
-    list_display = ('get_nome_completo', 'cpf', 'email')
-    search_fields = ('nome', 'sobrenome', 'cpf', 'email', 'id')
+    list_display = ('get_nome_completo', 'cpf', 'email', 'whatsapp',)
+    search_fields = ('nome', 'sobrenome', 'cpf', 'email', 'id', 'whatsapp',)
     list_display_links = ('get_nome_completo', 'email', 'cpf',)
     list_per_page = 20
     def get_queryset(self, request):
@@ -137,10 +160,10 @@ class ContatoNormais(admin.ModelAdmin):
 
 @admin.register(ContatoDeLoja)
 class ContatoDeLojas(admin.ModelAdmin):
-    list_display = ('get_nome_completo', 'get_instagram', 'email', 'get_telefone',)
-    search_fields = ('nome', 'sobrenome', 'cpf', 'email', 'get_instagram', 'get_telefone', 'id',)
-    list_display_links = ('get_nome_completo', 'get_instagram', 'email', 'get_telefone',)
-    inlines = [ContatoLojaInline]
+    list_display = ('get_nome_completo', 'get_instagram', 'email', 'whatsapp',)
+    search_fields = ('nome', 'sobrenome', 'cpf', 'email', 'whatsapp', 'contatoloja__instagram', 'id',)
+    list_display_links = ('get_nome_completo', 'get_instagram', 'email',)
+    
     def get_queryset(self, request):
         return super().get_queryset(request).filter(contatoloja__isnull=False)
     
@@ -151,10 +174,6 @@ class ContatoDeLojas(admin.ModelAdmin):
     @admin.display(description='Instagram')
     def get_instagram(self, obj):
         return obj.contatoloja.instagram
-
-    @admin.display(description='Telefone')
-    def get_telefone(self, obj):
-        return obj.contatoloja.telefone
 
     class Media:
         js = (
@@ -177,29 +196,6 @@ class Lojas(admin.ModelAdmin):
     list_display_links = ('apelido',)
     search_fields = ('apelido', 'contatoloja__contato__nome', 'contatoloja__contato__email')
     inlines = [ContatoLojaAdminInline, EnderecoAdminInline]
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-
-        for instance in instances:
-            if isinstance(instance, ContatoLoja) and formset.cleaned_data:
-                contato_data = {
-                    'nome': formset.cleaned_data[0].get('nome'),
-                    'sobrenome': formset.cleaned_data[0].get('sobrenome'),
-                    'cpf': formset.cleaned_data[0].get('cpf'),
-                    'email': formset.cleaned_data[0].get('email'),
-                }
-                
-                if instance.pk and hasattr(instance, 'contato'):
-                    Contato.objects.filter(pk=instance.contato.pk).update(**contato_data)
-                    contato_obj = instance.contato
-                else:
-                    contato_obj = Contato.objects.create(**contato_data)
-                
-                instance.contato = contato_obj
-        
-        formset.save()
-        formset.save_m2m()
 
     @admin.display(description='E-mail do Contato')
     def get_contato_email(self, obj):
@@ -267,7 +263,6 @@ class Produtos(admin.ModelAdmin):
         queryset = queryset.prefetch_related('categorias', 'imagens')
         return queryset
 
-## FINALIZADO## 
 @admin.register(Pedido)
 class Pedidos(admin.ModelAdmin):
     list_display = ('id', 'contato_cliente', 'status', 'data_hora_criacao', 'valor_total_do_pedido')

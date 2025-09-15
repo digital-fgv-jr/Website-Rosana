@@ -14,23 +14,38 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     const maskCnpj = (value) => {
         let v = value.replace(/\D/g, '');
-        v = v.substring(0, 14);        if (v.length > 12) {
-            v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5');
-        } else if (v.length > 8) {
-            v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/, '$1.$2.$3/$4');
+        let verif = value.replace(/[^0-9Xx]/g, '').substring(12, 14).toUpperCase();
+        v = v.substring(0, 12);
+        let masked = v;
+        if (v.length > 8) {
+            masked = `${v.substring(0,2)}.${v.substring(2,5)}.${v.substring(5,8)}/${v.substring(8,12)}`;
         } else if (v.length > 5) {
-            v = v.replace(/^(\d{2})(\d{3})(\d{0,3}).*/, '$1.$2.$3');
+            masked = `${v.substring(0,2)}.${v.substring(2,5)}.${v.substring(5,8)}`;
         } else if (v.length > 2) {
-            v = v.replace(/^(\d{2})(\d{0,3}).*/, '$1.$2');
+            masked = `${v.substring(0,2)}.${v.substring(2,5)}`;
+        } 
+        if (verif.length > 0) {
+            masked += `-${verif}`;
         }
-        return v;
+        return masked;
     };
+
 
     const maskCpf = (value) => {
         let v = value.replace(/\D/g, '');
-        v = v.substring(0, 11);
-        return v;
-    };    
+        let verif = value.replace(/[^0-9Xx]/g, '').substring(9, 11).toUpperCase();
+        v = v.substring(0, 9);
+        let masked = v;
+        if (v.length > 6) {
+            masked = `${v.substring(0,3)}.${v.substring(3,6)}.${v.substring(6,9)}`;
+        } else if (v.length > 3) {
+            masked = `${v.substring(0,3)}.${v.substring(3,6)}`;
+        }
+        if (verif.length > 0) {
+            masked += `-${verif}`;
+        }
+        return masked;
+    };   
     
     const maskInstagram = (value) => {
         if (!value) {
@@ -52,7 +67,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }; 
 
     applyMask('input[name$="-whatsapp"]', maskPhone);
-    applyMask('input[name$="-telefone"]', maskPhone);
     applyMask('input[name$="-cnpj"]', maskCnpj);
     applyMask('input[name$="cpf"]', maskCpf);
     applyMask('input[name$="-instagram"]', maskInstagram);

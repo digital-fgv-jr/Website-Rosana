@@ -1,4 +1,4 @@
-# Database v15.5.0
+# Database v16.2.1
 import uuid
 from io import BytesIO
 from PIL import Image as PILImage
@@ -118,7 +118,7 @@ class Contato(BaseModel):
     nome = models.CharField(max_length=64, blank=False, null=False)
     sobrenome = models.CharField(max_length=128)
     cpf = models.CharField(
-        max_length=11,
+        max_length=14,
         blank=False, 
         null=False,
         validators=[
@@ -127,7 +127,15 @@ class Contato(BaseModel):
         verbose_name='CPF'
         )
     email = models.EmailField(max_length=128, blank=False, null=False, verbose_name='E-mail')
-
+    whatsapp = models.CharField(
+        max_length=15,                        
+        validators=[
+            MinLengthValidator(13),
+            ], 
+        verbose_name='WhatsApp',
+        blank=False, 
+        null=False,
+        )
     def __str__(self):
         return f'{self.nome} {self.sobrenome}'
     
@@ -138,19 +146,6 @@ class Contato(BaseModel):
 class ContatoLoja(models.Model):
     loja = models.OneToOneField(Loja, on_delete=models.CASCADE, primary_key=True)
     contato = models.OneToOneField(Contato, on_delete=models.CASCADE, verbose_name='Contato da Loja')
-    whatsapp = models.CharField(
-        max_length=15,                        
-        validators=[
-            MinLengthValidator(13),
-            ], 
-        verbose_name='WhatsApp'
-        )
-    telefone = models.CharField(
-        max_length=15,
-        validators=[
-            MinLengthValidator(13),
-            ],
-        )
     instagram = models.CharField(max_length=32)
     cnpj = models.CharField(
         max_length=18,
