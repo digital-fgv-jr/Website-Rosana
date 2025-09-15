@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div id="content-main">
+    <form method="post">
+        {% csrf_token %}
+        
+        <input type="hidden" name="action" value="{{ action_name }}">
+
+        <h2>Gerar Etiqueta (Melhor Envio)</h2>
+        <p>Por favor, informe as dimensões e o peso final do pacote para o(s) <strong>{{ queryset|length }} pedido(s)</strong> selecionado(s).</p>
+        
+        <fieldset class="module aligned">
+            {% for field in form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                    <div class="form-row">
+                        {{ field.errors }}
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="help">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </fieldset>
+
+        <div class="submit-row">
+            <input type="submit" name="confirmar_geracao" value="Confirmar e Gerar Etiqueta" class="default">
+        </div>
+    </form>
+</div>
+{% endblock %}

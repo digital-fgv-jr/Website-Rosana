@@ -1,10 +1,15 @@
-# Admin v13.13.10
+# Admin v13.14.1
 
 from django.contrib import admin
 from django.utils.html import format_html
-from django import forms
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.shortcuts import redirect
+
+from django.conf import settings
+from django.template.response import TemplateResponse
+import requests # Você precisará instalar: pip install requests
+import json
 
 from .models import (
     Endereco, Contato, ContatoLoja, ContatoNormal, ContatoDeLoja,
@@ -12,45 +17,7 @@ from .models import (
     Tamanho, TamanhoProduto, Pedido, ItemPedido, ImagemProduto, ImagemCategoria,
 )
 
-
-## FORMS ##
-class ContatoLojaAdminForm(forms.ModelForm):
-    nome = forms.CharField(label='Nome do Contato', max_length=64)
-    sobrenome = forms.CharField(label='Sobrenome', max_length=128, required=False)
-    cpf = forms.CharField(label='CPF', max_length=14)
-    email = forms.EmailField(label='E-mail', max_length=128)
-    whatsapp = forms.CharField(label='WhatsApp', max_length=15)
-
-    class Meta:
-        model = ContatoLoja
-        fields = ['instagram', 'cnpj']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, 'contato'):
-            contato = self.instance.contato
-            self.initial['nome'] = contato.nome
-            self.initial['sobrenome'] = contato.sobrenome
-            self.initial['cpf'] = contato.cpf
-            self.initial['email'] = contato.email
-            self.initial['whatsapp'] = contato.whatsapp
-    
-    def save(self, commit=True):
-        contato_data = {
-            'nome': self.cleaned_data['nome'],
-            'sobrenome': self.cleaned_data['sobrenome'],
-            'cpf': self.cleaned_data['cpf'],
-            'email': self.cleaned_data['email'],
-            'whatsapp': self.cleaned_data['whatsapp'],
-        }
-        if self.instance.pk and hasattr(self.instance, 'contato'):
-            Contato.objects.filter(pk=self.instance.contato.pk).update(**contato_data)
-            self.instance.contato.refresh_from_db()
-        else:
-            contato = Contato.objects.create(**contato_data)
-            self.instance.contato = contato
-
-        return super().save(commit=commit)
+from .forms import ContatoLojaAdminForm, GerarEtiquetaMelhorEnvioForm
 
 ## INLINES ##
 
@@ -263,6 +230,164 @@ class Produtos(admin.ModelAdmin):
         queryset = queryset.prefetch_related('categorias', 'imagens')
         return queryset
 
+
+@admin.action(description='Gerar Etiqueta (Melhor Envio)')
+def gerar_etiqueta_melhor_envio(modeladmin, request, queryset):
+    print("\n--- AÇÃO INICIADA ---")
+    print(f"Método da Requisição: {request.method}")
+    print(f"Dados do POST: {request.POST}")
+    # --- MOMENTO 0: Pegar a primeira instância de Loja ---
+    loja = Loja.objects.first()
+    if not loja:
+        modeladmin.message_user(request, "Nenhuma loja configurada no sistema.", 'error')
+        return
+
+    contato_loja = getattr(loja, 'contatoloja', None)
+    contato = getattr(contato_loja, 'contato', None)
+    endereco_loja = loja.endereco_set.first()
+
+    documento_remetente = (contato_loja.cnpj if contato_loja and contato_loja.cnpj else (contato.cpf if contato else ""))
+
+    REMETENTE = {
+        "name": loja.apelido or "Rô Alves Jewellery",
+        "phone": contato.whatsapp if contato else "",
+        "email": contato.email if contato else "",
+        "document": documento_remetente,
+        "address": endereco_loja.logradouro if endereco_loja else "",
+        "number": str(endereco_loja.numero) if endereco_loja and endereco_loja.numero else "",
+        "district": endereco_loja.bairro if endereco_loja else "",
+        "city": endereco_loja.cidade if endereco_loja else "",
+        "state_abbr": endereco_loja.uf if endereco_loja else "",
+        "country_id": "BR",
+        "postal_code": endereco_loja.cep.replace('-', '') if endereco_loja else "",
+        "complement": endereco_loja.complemento if endereco_loja and endereco_loja.complemento else "",
+    }
+    
+    # --- MOMENTO 2: Processar o formulário preenchido ---
+    if 'confirmar_geracao' in request.POST:
+        base_url = settings.MELHOR_ENVIO_BASE_URL
+        print("--- ETAPA 2 DETECTADA: Tentando processar o formulário de dimensões. ---")
+        form = GerarEtiquetaMelhorEnvioForm(request.POST)
+        if form.is_valid():
+            print("--- SUCESSO: Formulário é válido. Iniciando lógica da API. ---")
+            peso = form.cleaned_data['peso']
+            comprimento = form.cleaned_data['comprimento']
+            largura = form.cleaned_data['largura']
+            altura = form.cleaned_data['altura']
+            
+            pedido_ids_str = form.cleaned_data['selected_ids']
+            pedido_ids = pedido_ids_str.split(',')
+            pedidos_selecionados = modeladmin.get_queryset(request).filter(pk__in=pedido_ids)
+            
+            headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {settings.MELHOR_ENVIO_TOKEN}',
+                'User-Agent': f'{settings.MELHOR_ENVIO_NAME} ({settings.MELHOR_ENVIO_EMAIL})'
+            }
+            
+            mapa_ordem_pedido = {}
+
+            for pedido in pedidos_selecionados:
+                valor_declarado = sum(item.preco_unitario_congelado * item.quantidade for item in pedido.itens.all())
+                
+                service_id = pedido.info_entrega.servico_id
+                if not service_id:
+                    modeladmin.message_user(request, f"O Pedido #{pedido.id} não possui um ID de serviço de frete definido.", 'error')
+                    continue
+
+                payload_carrinho = {
+                    "service": service_id,
+                    "from": REMETENTE,
+                    "to": {
+                        "name": f"{pedido.contato_cliente.nome} {pedido.contato_cliente.sobrenome}",
+                        "phone": pedido.contato_cliente.whatsapp.replace('(', '').replace(')', '').replace('-', '').replace(' ', ''),
+                        "email": pedido.contato_cliente.email,
+                        "document": pedido.contato_cliente.cpf,
+                        "address": pedido.endereco_entrega.logradouro,
+                        "number": str(pedido.endereco_entrega.numero),
+                        "complement": pedido.endereco_entrega.complemento,
+                        "district": pedido.endereco_entrega.bairro,
+                        "city": pedido.endereco_entrega.cidade,
+                        "state_abbr": pedido.endereco_entrega.uf,
+                        "country_id": "BR",
+                        "postal_code": pedido.endereco_entrega.cep.replace('-', ''),
+                    },
+                    "products": [
+                        {"name": item.produto.nome, "quantity": item.quantidade, "unitary_value": float(item.preco_unitario_congelado)}
+                        for item in pedido.itens.all()
+                    ],
+                    "volumes": [{"height": float(altura), "width": float(largura), "length": float(comprimento), "weight": float(peso)}],
+                    "options": {
+                        "insurance_value": float(valor_declarado),
+                        "receipt": False,
+                        "own_hand": False,
+                        "non_commercial": True, # IMPORTANTE: Mude para False se for enviar com Nota Fiscal
+                        # "invoice": { "key": "SUA_CHAVE_DE_NF_AQUI" } # Descomente e adicione a chave se non_commercial=False
+                    }
+                }
+                
+                try:
+                    response_cart = requests.post(f"{base_url}/api/v2/me/cart", headers=headers, data=json.dumps(payload_carrinho))
+                    response_cart.raise_for_status()
+                    ordem_id = response_cart.json()['id']
+                    mapa_ordem_pedido[ordem_id] = pedido # Mapeia o ID da ME para o nosso pedido
+                except requests.exceptions.RequestException as e:
+                    modeladmin.message_user(request, f"Erro na API (carrinho) para o Pedido #{pedido.id}: {e.response.text}", 'error')
+
+            ordens_para_checkout = list(mapa_ordem_pedido.keys())
+            if ordens_para_checkout:
+                try:
+                    # Comprar, Gerar e Imprimir
+                    requests.post(f"{base_url}/api/v2/me/shipment/checkout", headers=headers, json={"orders": ordens_para_checkout}).raise_for_status()
+                    requests.post(f"{base_url}/api/v2/me/shipment/generate", headers=headers, json={"orders": ordens_para_checkout}).raise_for_status()
+                    response_print = requests.post(f"{base_url}/api/v2/me/shipment/print", headers=headers, json={"mode": "private", "orders": ordens_para_checkout})
+                    response_print.raise_for_status()
+                    url_etiqueta = response_print.json()['url']
+                    
+                    # Atualizar os pedidos no banco de dados
+                    ordens_info = requests.get(f"{base_url}/api/v2/me/orders/{','.join(ordens_para_checkout)}", headers=headers).json()
+                    for ordem_id, info in ordens_info.items():
+                        if 'tracking' in info and info['tracking']:
+                            pedido_a_atualizar = mapa_ordem_pedido[ordem_id]
+                            pedido_a_atualizar.info_entrega.rastreador = info['tracking']
+                            pedido_a_atualizar.info_entrega.save()
+                            pedido_a_atualizar.status = 'S'
+                            pedido_a_atualizar.save()
+                    print("--- LÓGICA DA API FINALIZADA (simulação). Redirecionando... ---")
+                    modeladmin.message_user(request, mark_safe(f"Etiquetas geradas com sucesso. <a href='{url_etiqueta}' target='_blank'>Clique aqui para imprimir</a>."), 'success')
+
+                except requests.exceptions.RequestException as e:
+                    modeladmin.message_user(request, f"Erro na API (checkout/impressão): {e.response.text}", 'error')
+            return
+        else:
+            print("--- ERRO: Formulário é inválido! ---")
+            print(form.errors.as_json())
+            # Se o formulário for inválido, vamos mostrar os erros no admin
+            modeladmin.message_user(request, f"Erro de validação no formulário: {form.errors.as_json()}", 'error')
+            return
+        
+
+    print("--- ETAPA 1 DETECTADA: Exibindo o formulário de dimensões. ---")
+    pks_list = list(queryset.values_list('pk', flat=True))
+    pks_string = ','.join(str(pk) for pk in pks_list)
+    
+    form = GerarEtiquetaMelhorEnvioForm(initial={
+        'selected_ids': pks_string
+    })
+
+    context = {
+        'title': 'Informar Dimensões do Pacote (Melhor Envio)',
+        'queryset': queryset,
+        'form': form,
+        'opts': modeladmin.model._meta,
+        'action_name': 'gerar_etiqueta_melhor_envio',
+    }
+
+    return TemplateResponse(request, "admin/gerar_etiqueta_melhor_envio_form.html", context)
+
+gerar_etiqueta_melhor_envio.short_description = 'Gerar Etiqueta (Melhor Envio)'
+
 @admin.register(Pedido)
 class Pedidos(admin.ModelAdmin):
     list_display = ('id', 'contato_cliente', 'status', 'data_hora_criacao', 'valor_total_do_pedido')
@@ -278,6 +403,7 @@ class Pedidos(admin.ModelAdmin):
     )
     
     inlines = [ItemPedidoInline]
+    actions = [gerar_etiqueta_melhor_envio]
 
     def has_add_permission(self, request):
         return False
@@ -285,7 +411,7 @@ class Pedidos(admin.ModelAdmin):
     @admin.display(description='Valor Total', ordering='id')
     def valor_total_do_pedido(self, obj):
         total_produtos = 0
-        for item in obj.itempedido_set.all():
+        for item in obj.itens.all():
             total_produtos += item.quantidade * item.preco_unitario_congelado
         preco_frete = 0
         if obj.info_entrega and obj.info_entrega.preco_frete:

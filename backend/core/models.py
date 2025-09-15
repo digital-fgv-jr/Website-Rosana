@@ -1,4 +1,4 @@
-# Database v16.2.1
+# Database v16.3.1
 import uuid
 from io import BytesIO
 from PIL import Image as PILImage
@@ -20,6 +20,7 @@ class InformacoesEntrega(BaseModel):
     entrega_estimada = models.DateField()
     rastreador = models.CharField(max_length=32)
     transportadora = models.CharField(max_length=32)
+    servico_id = models.IntegerField(null=True, blank=True, verbose_name='ID do Serviço de Frete')
     preco_frete = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -269,9 +270,9 @@ class TamanhoProduto(BaseModel):
 class Pedido(BaseModel):
     STATUS = (
         ('A', 'Aguardando Pagamento'),
-        ('R', 'Recusada'),
+        ('R', 'Recusado'),
         ('E', 'Em Preparo'),
-        ('S', 'Enviada'),
+        ('S', 'Enviado'),
         ('C', 'Concluída'),
     )
     contato_cliente = models.ForeignKey(Contato, on_delete=models.PROTECT, verbose_name='Contado do Cliente')
