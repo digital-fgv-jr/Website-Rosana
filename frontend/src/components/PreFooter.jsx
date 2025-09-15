@@ -24,7 +24,7 @@ export default function PreFooter() {
   const politicasRedes = [
     { label: "Política de Privacidade", href: "/privacidade" }, // único novo necessário
     { label: "Instagram", href: "https://instagram.com/roalves_jewellery", external: true },
-    { label: "WhatsApp", href: "https://wa.me/55SEUNUMERO", external: true },
+    { label: "WhatsApp", href: "https://wa.me/5521984744189", external: true },
   ];
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });

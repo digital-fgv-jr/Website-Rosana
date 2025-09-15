@@ -11,7 +11,7 @@ import styles from "./WhatsApp.module.css";
  * @param {string} bg            - override CSS var (--wa-bg). Ex: "#c2b280"
  */
 export default function WhatsApp({
-  phone,
+  phone = "5521984744189",
   message = "",
   position = "right",
   top,

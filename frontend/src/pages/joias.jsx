@@ -10,6 +10,33 @@ import WhatsApp from "../components/Atoms/WhatsApp";
 import FiltroProdutos from "../components/FiltroProdutos";
 
 /* ========================= Helpers ========================= */
+// Garante que a imagem sempre aponte para a origem do backend,
+// preservando apenas o path/query/hash recebido do campo de imagem.
+const backendOrigin = (() => {
+  try {
+    const url = new URL(import.meta.env.VITE_API_URL);
+    return url.origin; // ex.: http://localhost:8000
+  } catch (_e) {
+    try {
+      return window.location.origin;
+    } catch (_e2) {
+      return "";
+    }
+  }
+})();
+
+const toBackendUrl = (input) => {
+  const placeholder = "/placeholder.svg";
+  if (!input) return placeholder;
+  try {
+    const parsed = new URL(input, backendOrigin || undefined);
+    // Reescreve para a origem do backend, mantendo apenas path/query/hash
+    return `${backendOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch (_e) {
+    const path = String(input).startsWith("/") ? String(input) : `/${String(input)}`;
+    return `${backendOrigin}${path}`;
+  }
+};
 const parseNumberSmart = (v) => {
   if (v === undefined || v === null || v === "") return null;
   if (typeof v === "number") return Number.isFinite(v) ? v : null;
@@ -86,7 +113,7 @@ const getMateriaisFromProduto = (p) => {
 
 /** Categoria do produto (dataset usa { nome_categoria }) */
 const getCategoriaSlugFromProduto = (p) =>
-  String(p?.categoria?.nome_categoria || p?.categoria || "").toLowerCase();
+  String(p?.categoria?.nome_categoria || p?.categoria || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 /** Mapeia aliases da URL/UI -> slug real do dataset */
 const mapCategoriaParamToSlug = (param) => {
@@ -311,7 +338,19 @@ export default function Joias() {
               className="bg-brancoperola font-MontserratRegular overflow-hidden transform transition-all duration-300 rounded-md hover:rounded-xl hover:scale-105 hover:shadow-xl border border-transparent hover:border-[#c2b280]"
             >
               <div className="w-full aspect-square sm:aspect-[4/3] md:h-64 overflow-hidden bg-[#f1efe9]">
-                <img src={produto.__thumb} alt={produto.nome} className="w-full h-full object-cover" loading="lazy" />
+                {(() => {
+                  const raw = produto?.__thumb || produto?.imagens?.[0]?.imagem || "/placeholder.svg";
+                  const src = toBackendUrl(raw);
+                  return (
+                    <img
+                      src={src}
+                      alt={produto.nome}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/placeholder.svg'; }}
+                    />
+                  );
+                })()}
               </div>
               <div className="p-3 sm:p-4 text-left">
                 <h2 className="text-[0.95rem] sm:text-lg font-semibold line-clamp-2">{produto.nome}</h2>

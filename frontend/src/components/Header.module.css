@@ -2,31 +2,35 @@
   --header-h: 65px;
 }
 
+/* ===================== BASE / GUARD-RAILS ===================== */
+*, *::before, *::after { box-sizing: border-box; }
+
 .root {
-  position: relative; /* header normal não-sticky */
+  position: relative;           /* header normal não-sticky */
   width: 100%;
-  background-color: #faf9f6;
+  background: #faf9f6;
   color: #1c2c3c;
   z-index: 1;
+  overflow-x: hidden;           /* evita qualquer bleed horizontal */
 }
 
 .wrap {
   max-width: 72rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 0rem;
+  margin-inline: auto;
+  padding-inline: 0;
 }
 
-/* ===== Barra superior ===== */
+/* ===================== TOP BAR ===================== */
 .topBar {
   position: relative;
   display: flex;
-  align-items: center;          /* alinha verticalmente */
+  align-items: center;
   justify-content: space-between;
   height: var(--header-h);
 }
+.topBar > * { min-width: 0; }   /* filhos podem encolher sem estourar */
 
-/* logo central */
+/* Logo (desktop) */
 .logoLink {
   position: absolute;
   left: 50%;
@@ -36,291 +40,549 @@
 .logo {
   height: 65px;
   width: auto;
+  max-width: 60vw;
   object-fit: contain;
 }
 
-/* ===== Ações laterais ===== */
+/* Ações laterais */
 .leftBtn,
 .rightBtn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  height: 32px;                 /* mesma altura dos ícones/botões */
+  gap: .5rem;
+  height: 32px;
   line-height: 1;
-  font-size: 0.875rem;
+  font-size: .875rem;
   background: #faf9f6;
   border: 0;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: opacity .2s ease;
   font-family: 'Montserrat', sans-serif;
-  margin: 0;                    /* zera margens antigas que deslocavam */
-  padding: 0;                   /* aparência “texto+ícone” limpa */
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
 }
-.leftBtn {
-  margin-left: 0.5rem;
-  text-decoration: underline;
-}
-.leftBtn:hover,
-.rightBtn:hover {
-  opacity: 0.8;
-}
+.leftBtn { margin-left: .5rem; text-decoration: underline; }
+.leftBtn:hover, .rightBtn:hover { opacity: .8; }
 
-/* Direita: Buscar/Input + Carrinho */
 .rightCol {
   display: flex;
   align-items: center;
-  gap: 0.5rem;                 /* espaço entre Buscar/Input e carrinho */
-  margin-right: 0.75rem;
+  gap: .5rem;
+  margin-right: .75rem;
+  min-width: 0;
 }
 
-/* Input de busca (mesma altura do botão Buscar) */
+/* Busca */
 .searchInput {
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 6px;
-  height: 32px;                /* igual ao .rightBtn */
-  padding: 0 0.75rem;
+  height: 32px;
+  padding: 0 .75rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.9rem;
+  font-size: .9rem;
   min-width: 160px;
+  max-width: 28vw;
   outline: none;
   line-height: 1;
   display: inline-flex;
-  align-items: center;         /* centra o texto verticalmente */
+  align-items: center;
 }
 .searchInput:focus { border-color: #1c2c3c; }
 
-/* Ícone/botão do carrinho */
+/* Carrinho */
 .iconBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  color: #1c2c3c;              /* lucide usa stroke=currentColor */
+  width: 32px; height: 32px;
+  color: #1c2c3c;
   border: 1px solid #1c2c3c;
   border-radius: 50%;
   background: transparent;
-  transition: background .2s ease, color .2s ease, border-color .2s ease;
+  transition: background .2s, color .2s, border-color .2s;
+  flex: 0 0 auto;
 }
-.iconBtn:hover {
-  background: #1c2c3c;
-  color: #fff;
-  border-color: #1c2c3c;
-}
-.iconSvg {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
+.iconBtn:hover { background:#1c2c3c; color:#fff; border-color:#1c2c3c; }
+.iconSvg { width: 18px; height: 18px; display:block; }
 
-/* ===================== NAV ===================== */
+/* ===================== NAV (desktop) ===================== */
 .nav {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   justify-items: center;
   align-items: center;
-  padding: 1.25rem 0;
+  padding-block: 1.25rem;
   gap: 12rem;
   font-family: 'Bodoni Moda', serif;
   white-space: nowrap;
 }
 .nav a {
-  font-size: clamp(0.95rem, 1.2vw, 1.35rem);
+  font-size: clamp(.95rem, 1.2vw, 1.35rem);
   color: #1c2c3c;
   text-decoration: none;
-  transition: opacity 0.2s ease;
+  transition: opacity .2s ease;
 }
-.nav a:hover { opacity: 0.8; }
+.nav a:hover { opacity: .8; }
 
-/* instagram dentro da nav */
+/* Instagram na nav */
 .navInsta {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;                /* espaço entre ícone e texto */
-  font-size: 0.9rem;
+  gap: .35rem;
+  font-size: .9rem;
   text-decoration: none;
   color: #1c2c3c;
-  transition: opacity 0.2s ease;
+  transition: opacity .2s ease;
   font-family: 'Montserrat', sans-serif;
 }
 .navInstaIcon {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  background: #000;
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  background: #000; color:#fff;
   border-radius: 50%;
   line-height: 0;
-  box-sizing: border-box;
+  flex: 0 0 auto;
 }
-.navInstaIcon svg {
-  display: block;
-  width: 18px;
-  height: 18px;
-  color: #fff;
-  transform: translateY(-0.5px); /* ajuste óptico */
-}
-.navInstaName {
-  font-weight: 700;
-  font-size: 0.9rem;
-}
+.navInstaIcon svg { width: 18px; height: 18px; display:block; transform: translateY(-.5px); }
+.navInstaName { font-weight: 700; font-size: .9rem; }
 
-/* ===================== Responsivo ===================== */
-@media (max-width: 1024px) {
-  .topBar {
-    height: auto;
-    padding: 1.25rem 0;
-  }
-  .logo { height: 56px; }
-  .nav {
-    grid-template-columns: 1fr;
-    row-gap: 0.75rem;
-  }
-}
+/* ===================== BREAKPOINTS ===================== */
 
-/* ===================== RESPONSIVIDADE ADICIONAL ===================== */
-
-/* 1) Desktop grande → reduz um pouco o espaçamento da nav */
+/* Desktop grande: reduz gaps */
 @media (max-width: 1280px) {
-  .nav {
-    gap: 8rem;          /* antes 12rem */
-    padding: 1rem 0;
-  }
+  .nav { gap: 8rem; padding-block: 1rem; }
   .logo { height: 60px; }
 }
 
-/* ===== Hotfix responsivo para faixa ~1060px ===== */
-/* 4 colunas + gaps menores entre 1120px e 921px */
+/* Faixa 1120→921 */
 @media (max-width: 1120px) and (min-width: 921px) {
   .nav {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 2rem;             /* reduz o espaço entre itens */
-    padding: 1rem 0;       /* altura um pouco menor */
+    gap: 2rem;
+    padding-block: 1rem;
   }
 }
 
-
-/* 3) Tablet landscape → nav em 3 colunas (diminui a altura total) */
+/* Tablet landscape */
 @media (max-width: 920px) {
   .nav {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.25rem 2rem;  /* row x col gap */
-    padding: 0.9rem 0;
+    gap: 1.25rem 2rem;
+    padding-block: .9rem;
   }
-  .nav a { font-size: clamp(0.9rem, 1vw, 1.1rem); }
+  .nav a { font-size: clamp(.9rem, 1vw, 1.1rem); }
   .logo { height: 54px; }
-  .rightCol { margin-right: 0.5rem; }
+  .rightCol { margin-right: .5rem; }
 }
 
-/* 4) Tablet portrait → nav em 2 colunas, ícone insta menor */
+/* Tablet portrait */
 @media (max-width: 760px) {
   .nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem 1.25rem;
-    padding: 0.75rem 0;
+    gap: .9rem 1.25rem;
+    padding-block: .75rem;
   }
   .navInstaIcon { width: 26px; height: 26px; }
-  .navInstaIcon svg { width: 16px; height: 16px; transform: translateY(-0.3px); }
+  .navInstaIcon svg { width: 16px; height: 16px; transform: translateY(-.3px); }
   .logo { height: 50px; }
   .leftBtn, .rightBtn, .searchInput { height: 30px; }
   .iconBtn { width: 30px; height: 30px; }
   .iconSvg { width: 17px; height: 17px; }
 }
 
-/* 5) Mobile → nav vira rolagem horizontal (sem quebrar layout) */
+/* ===================== MOBILE (≤640px) ===================== */
+/* objetivo: header e nav perfeitamente centralizados, sem overflow */
 @media (max-width: 640px) {
+  .wrap { padding-inline: 12px; }
+
+  /* Top bar em GRID → colunas: esquerda | logo | direita (tudo centralizado) */
   .topBar {
-    height: auto;
-    padding: 0.75rem 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    height: 56px;
+    padding: 0;
+    column-gap: 8px;
   }
-  .logo { height: 46px; }
-
-  .nav {
-    display: flex;                 /* override do grid só no mobile */
-    gap: 1.25rem;
-    padding: 0.5rem 0;
-    overflow-x: auto;              /* rolagem horizontal */
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity; /* deslize suave entre itens */
-  }
-  .nav a {
-    flex: 0 0 auto;                /* não encolher */
-    scroll-snap-align: start;
-    font-size: 0.95rem;
-  }
-
-  /* economiza espaço: esconde o texto do insta, mantém o círculo */
-  .navInstaName { display: none; }
-  .navInsta { gap: 0.25rem; }
-}
-
-/* 6) Mobile pequeno → ajustes finos de tamanhos */
-@media (max-width: 420px) {
-  .logo { height: 42px; }
-  .leftBtn { margin-left: 0.25rem; font-size: 0.83rem; }
-  .rightBtn { font-size: 0.83rem; }
-  .searchInput {
-    min-width: 130px;
-    font-size: 0.85rem;
-    padding: 0 0.6rem;
-    height: 28px;
-  }
-  .iconBtn { width: 28px; height: 28px; }
-  .iconSvg { width: 16px; height: 16px; }
-  .nav { gap: 1rem; }
-}
-
-/* 7) Muito pequeno (ex.: 360px) → ainda mais compacto */
-@media (max-width: 360px) {
-  .logo { height: 40px; }
-  .leftBtn, .rightBtn { font-size: 0.8rem; }
-  .nav a { font-size: 0.9rem; }
-}
-
-
-/* === MOBILE POLISH (≤640px) — sobrescreve e centraliza tudo certinho === */
-@media (max-width: 640px) {
-  .wrap { padding: 0 12px; }
-
-  /* barra com altura fixa e sem pular */
-  .topBar {
-    height: 56px;      /* altura estável */
-    padding: 0;        /* já temos altura fixa */
-  }
-
-  /* logo 100% centralizado na faixa superior */
   .logoLink {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* centraliza vertical e horizontal */
+    position: static;
+    transform: none;
+    justify-self: center;
+    align-self: center;
   }
-  .logo { height: 46px; }             /* folga segura */
-
-  /* ações laterais mais compactas */
-  .leftBtn, .rightBtn { 
-    height: 28px; 
-    font-size: 0.85rem; 
+  .logo {
+    height: 42px;
+    max-width: 48vw;           /* logo nunca empurra as laterais */
+    width: auto;
   }
 
-  .rightCol { gap: 0.35rem; }
+  /* Ações mais compactas */
+  .leftBtn, .rightBtn { height: 28px; font-size: .85rem; }
+  .rightCol { gap: .35rem; }
 
-  /* input de busca que não estoura layout */
+  /* Busca que não estoura layout */
   .searchInput {
     height: 28px;
-    min-width: 120px;
-    max-width: 44vw;   /* não empurra o logo */
+    min-width: 110px;
+    max-width: 38vw;           /* não empurra a logo */
+    font-size: .85rem;
+    padding: 0 .6rem;
   }
 
   .iconBtn { width: 30px; height: 30px; }
   .iconSvg { width: 17px; height: 17px; }
+
+  /* ===== NAV: centrada SEMPRE; com scroll horizontal quando precisar =====
+     - Usamos pseudo-elementos como "spacers" para manter o conteúdo centralizado
+       quando a soma dos itens < largura do container.
+     - Se a soma > largura, o usuário pode rolar; mesmo assim as bordas ficam simétricas. */
+  .nav {
+    display: flex;                   /* override do grid no mobile */
+    align-items: center;
+    justify-content: center;         /* centraliza quando couber */
+    gap: 1rem;
+    padding-block: .5rem;
+    padding-inline: 4px;             /* leve respiro nas bordas */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;             /* itens na mesma linha */
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  /* Spacers laterais para centralização ótica */
+  .nav::before,
+  .nav::after {
+    content: "";
+    flex: 1 0 8px;                   /* cria respiro e balanceia as bordas */
+  }
+
+  .nav a,
+  .nav .navInsta {
+    flex: 0 0 auto;                  /* não quebram, não encolhem */
+    scroll-snap-align: start;
+    text-align: center;
+  }
+
+  /* Snap suave quando houver rolagem */
+  .nav { scroll-snap-type: x proximity; }
+
+  /* Economiza espaço: esconde o texto do insta, mantém o círculo */
+  .navInstaName { display: none; }
+  .navInsta { gap: .25rem; }
 }
 
-/* telas bem pequenas */
-@media (max-width: 400px) {
-  .searchInput {
-    min-width: 110px;
-    max-width: 50vw;
+/* Mobile pequeno */
+@media (max-width: 420px) {
+  .logo { height: 40px; max-width: 52vw; }
+  .leftBtn { margin-left: .25rem; font-size: .83rem; }
+  .rightBtn { font-size: .83rem; }
+  .searchInput { min-width: 100px; max-width: 46vw; }
+  .iconBtn { width: 28px; height: 28px; }
+  .iconSvg { width: 16px; height: 16px; }
+  .nav { gap: .85rem; }
+}
+
+/* Muito pequeno (ex.: 360px) */
+@media (max-width: 360px) {
+  .logo { height: 38px; max-width: 54vw; }
+  .leftBtn, .rightBtn { font-size: .8rem; }
+  .nav a { font-size: .9rem; }
+}
+:root {
+  --header-h: 65px;
+}
+
+/* ===================== BASE / GUARD-RAILS ===================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+.root {
+  position: relative;           /* header normal não-sticky */
+  width: 100%;
+  background: #faf9f6;
+  color: #1c2c3c;
+  z-index: 1;
+  overflow-x: hidden;           /* evita qualquer bleed horizontal */
+}
+
+.wrap {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+/* ===================== TOP BAR ===================== */
+.topBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+}
+.topBar > * { min-width: 0; }   /* filhos podem encolher sem estourar */
+
+/* Logo (desktop) */
+.logoLink {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 15%;
+}
+.logo {
+  height: 65px;
+  width: auto;
+  max-width: 60vw;
+  object-fit: contain;
+}
+
+/* Ações laterais */
+.leftBtn,
+.rightBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  height: 32px;
+  line-height: 1;
+  font-size: .875rem;
+  background: #faf9f6;
+  border: 0;
+  cursor: pointer;
+  transition: opacity .2s ease;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+.leftBtn { margin-left: .5rem; text-decoration: underline; }
+.leftBtn:hover, .rightBtn:hover { opacity: .8; }
+
+.rightCol {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-right: .75rem;
+  min-width: 0;
+}
+
+/* Busca */
+.searchInput {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 32px;
+  padding: 0 .75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .9rem;
+  min-width: 160px;
+  max-width: 28vw;
+  outline: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
+.searchInput:focus { border-color: #1c2c3c; }
+
+/* Carrinho */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  color: #1c2c3c;
+  border: 1px solid #1c2c3c;
+  border-radius: 50%;
+  background: transparent;
+  transition: background .2s, color .2s, border-color .2s;
+  flex: 0 0 auto;
+}
+.iconBtn:hover { background:#1c2c3c; color:#fff; border-color:#1c2c3c; }
+.iconSvg { width: 18px; height: 18px; display:block; }
+
+/* ===================== NAV (desktop) ===================== */
+.nav {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  justify-items: center;
+  align-items: center;
+  padding-block: 1.25rem;
+  gap: 12rem;
+  font-family: 'Bodoni Moda', serif;
+  white-space: nowrap;
+}
+.nav a {
+  font-size: clamp(.95rem, 1.2vw, 1.35rem);
+  color: #1c2c3c;
+  text-decoration: none;
+  transition: opacity .2s ease;
+}
+.nav a:hover { opacity: .8; }
+
+/* Instagram na nav */
+.navInsta {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .9rem;
+  text-decoration: none;
+  color: #1c2c3c;
+  transition: opacity .2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+.navInstaIcon {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  background: #000; color:#fff;
+  border-radius: 50%;
+  line-height: 0;
+  flex: 0 0 auto;
+}
+.navInstaIcon svg { width: 18px; height: 18px; display:block; transform: translateY(-.5px); }
+.navInstaName { font-weight: 700; font-size: .9rem; }
+
+/* ===================== BREAKPOINTS ===================== */
+
+/* Desktop grande: reduz gaps */
+@media (max-width: 1280px) {
+  .nav { gap: 8rem; padding-block: 1rem; }
+  .logo { height: 60px; }
+}
+
+/* Faixa 1120→921 */
+@media (max-width: 1120px) and (min-width: 921px) {
+  .nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+    padding-block: 1rem;
   }
+}
+
+/* Tablet landscape */
+@media (max-width: 920px) {
+  .nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem 2rem;
+    padding-block: .9rem;
+  }
+  .nav a { font-size: clamp(.9rem, 1vw, 1.1rem); }
+  .logo { height: 54px; }
+  .rightCol { margin-right: .5rem; }
+}
+
+/* Tablet portrait */
+@media (max-width: 760px) {
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .9rem 1.25rem;
+    padding-block: .75rem;
+  }
+  .navInstaIcon { width: 26px; height: 26px; }
+  .navInstaIcon svg { width: 16px; height: 16px; transform: translateY(-.3px); }
+  .logo { height: 50px; }
+  .leftBtn, .rightBtn, .searchInput { height: 30px; }
+  .iconBtn { width: 30px; height: 30px; }
+  .iconSvg { width: 17px; height: 17px; }
+}
+
+/* ===================== MOBILE (≤640px) ===================== */
+/* objetivo: header e nav perfeitamente centralizados, sem overflow */
+@media (max-width: 640px) {
+  .wrap { padding-inline: 12px; }
+
+  /* Top bar em GRID → colunas: esquerda | logo | direita (tudo centralizado) */
+  .topBar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    height: 56px;
+    padding: 0;
+    column-gap: 8px;
+  }
+  .logoLink {
+    position: static;
+    transform: none;
+    justify-self: center;
+    align-self: center;
+  }
+  .logo {
+    height: 42px;
+    max-width: 48vw;           /* logo nunca empurra as laterais */
+    width: auto;
+  }
+
+  /* Ações mais compactas */
+  .leftBtn, .rightBtn { height: 28px; font-size: .85rem; }
+  .rightCol { gap: .35rem; }
+
+  /* Busca que não estoura layout */
+  .searchInput {
+    height: 28px;
+    min-width: 110px;
+    max-width: 38vw;           /* não empurra a logo */
+    font-size: .85rem;
+    padding: 0 .6rem;
+  }
+
+  .iconBtn { width: 30px; height: 30px; }
+  .iconSvg { width: 17px; height: 17px; }
+
+  /* ===== NAV: centrada SEMPRE; com scroll horizontal quando precisar =====
+     - Usamos pseudo-elementos como "spacers" para manter o conteúdo centralizado
+       quando a soma dos itens < largura do container.
+     - Se a soma > largura, o usuário pode rolar; mesmo assim as bordas ficam simétricas. */
+  .nav {
+    display: flex;                   /* override do grid no mobile */
+    align-items: center;
+    justify-content: center;         /* centraliza quando couber */
+    gap: 1rem;
+    padding-block: .5rem;
+    padding-inline: 4px;             /* leve respiro nas bordas */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;             /* itens na mesma linha */
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  /* Spacers laterais para centralização ótica */
+  .nav::before,
+  .nav::after {
+    content: "";
+    flex: 1 0 8px;                   /* cria respiro e balanceia as bordas */
+  }
+
+  .nav a,
+  .nav .navInsta {
+    flex: 0 0 auto;                  /* não quebram, não encolhem */
+    scroll-snap-align: start;
+    text-align: center;
+  }
+
+  /* Snap suave quando houver rolagem */
+  .nav { scroll-snap-type: x proximity; }
+
+  /* Economiza espaço: esconde o texto do insta, mantém o círculo */
+  .navInstaName { display: none; }
+  .navInsta { gap: .25rem; }
+}
+
+/* Mobile pequeno */
+@media (max-width: 420px) {
+  .logo { height: 40px; max-width: 52vw; }
+  .leftBtn { margin-left: .25rem; font-size: .83rem; }
+  .rightBtn { font-size: .83rem; }
+  .searchInput { min-width: 100px; max-width: 46vw; }
+  .iconBtn { width: 28px; height: 28px; }
+  .iconSvg { width: 16px; height: 16px; }
+  .nav { gap: .85rem; }
+}
+
+/* Muito pequeno (ex.: 360px) */
+@media (max-width: 360px) {
+  .logo { height: 38px; max-width: 54vw; }
+  .leftBtn, .rightBtn { font-size: .8rem; }
+  .nav a { font-size: .9rem; }
 }

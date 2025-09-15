@@ -1,5 +1,27 @@
 import { Link } from "react-router-dom";
 
+// Mesma regra de URL das imagens: usa sempre a origem do backend + path
+const backendOrigin = (() => {
+  try {
+    const url = new URL(import.meta.env.VITE_API_URL);
+    return url.origin;
+  } catch (_e) {
+    try { return window.location.origin; } catch (_e2) { return ""; }
+  }
+})();
+
+const toBackendUrl = (input) => {
+  const placeholder = "/placeholder.svg";
+  if (!input) return placeholder;
+  try {
+    const parsed = new URL(input, backendOrigin || undefined);
+    return `${backendOrigin}${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch (_e) {
+    const path = String(input).startsWith("/") ? String(input) : `/${String(input)}`;
+    return `${backendOrigin}${path}`;
+  }
+};
+
 export default function ProdutosRelacionados({ produtos }) {
   if (!produtos || produtos.length === 0) return null;
 
@@ -22,7 +44,7 @@ export default function ProdutosRelacionados({ produtos }) {
             "
           >
             <img
-              src={produto.imagens[0].imagem}
+              src={toBackendUrl(produto.imagens[0].imagem)}
               alt={produto.nome}
               className="w-full h-64 object-cover"
             />
@@ -36,4 +58,3 @@ export default function ProdutosRelacionados({ produtos }) {
     </div>
   );
 }
-
