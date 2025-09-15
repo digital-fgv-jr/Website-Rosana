@@ -4,49 +4,42 @@ const PLACEHOLDER = '/placeholder.svg';
 
 function normalizeImageUrl(url) {
   if (!url) return PLACEHOLDER;
-  try {
-    // Tenta criar uma URL absoluta. Se a base for um caminho relativo, usa a origem da janela.
-    const base = API_BASE.startsWith('http') ? new URL(API_BASE) : new URL(window.location.origin);
-    const parsed = new URL(url, base);
-    return parsed.toString();
-  } catch (_e) {
-    if (API_BASE && String(url).startsWith('/')) {
-      return API_BASE + url;
+  // Em dev, a VITE_API_URL é '/api', que não é uma base de URL válida.
+  // Nesse caso, o proxy do Vite já resolve o caminho, então o caminho relativo já funciona.
+  if (API_BASE.startsWith('http')) {
+    try {
+      // Em produção, montamos a URL completa.
+      return new URL(url, API_BASE).toString();
+    } catch (e) {
+      return url; // Fallback
     }
-    return url;
   }
+  // Para ambiente de dev com proxy, o caminho relativo como está já é o correto.
+  return url;
 }
 
 /**
- * Pega um objeto de produto da API (seja da lista ou do detalhe) e o transforma 
- * em um formato padronizado para uso nos componentes do frontend.
+ * Pega um objeto de produto da API e o transforma em um formato padronizado.
  * @param {object} produtoDaApi - O objeto de produto vindo do backend.
  * @returns {object} Um objeto de produto formatado.
  */
 export const formatarProdutoParaFrontend = (produtoDaApi) => {
   if (!produtoDaApi) return null;
 
-  // Lógica aprimorada para imagem:
-  // Prioriza 'primeira_imagem' (da lista) ou a primeira de 'imagens' (do detalhe).
   const imagemPrincipal = normalizeImageUrl(
     produtoDaApi.primeira_imagem || produtoDaApi.imagens?.[0]?.imagem
   );
 
-  // Formata o preço para o padrão brasileiro
   const precoFormatado = `R$ ${parseFloat(produtoDaApi.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
-  // Constrói o objeto final no formato desejado
   return {
     id: produtoDaApi.id,
     nome: produtoDaApi.nome,
     preco: precoFormatado,
     categorias: produtoDaApi.categorias || [],
+    __thumb: imagemPrincipal, // Alias para a lista de produtos
 
-    // Campo auxiliar usado pelos cards de produto na lista
-    __thumb: imagemPrincipal,
-
-    // --- Campos que podem ou não existir (só vêm na versão de detalhe) ---
-    // Usamos '|| []' ou '|| 0' como fallback para evitar erros.
+    // Campos de detalhe com fallback
     descricao: produtoDaApi.descricao || '',
     qtd_disponivel: produtoDaApi.qtd_disponivel || 0,
     

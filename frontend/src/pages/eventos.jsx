@@ -45,7 +45,7 @@ export default function Eventos() {
           </div>
 
           {/* Imagens */}
-          <div className="flex-1 flex flex-col gap-4">
+          <div className="flex-1 flex flex-col gap-4 rounded-lg">
             <img src="/filigrana1.jpg" alt="Evento 1" className="w-full h-[370px] object-cover " />
             <img src="/pingente1.jpg" alt="Evento 2" className="w-full h-[370px] object-cover " />
           </div>

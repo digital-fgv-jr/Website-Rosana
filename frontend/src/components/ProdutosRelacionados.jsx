@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-// Mesma regra de URL das imagens: usa sempre a origem do backend + path
+// Helper para garantir a URL completa da imagem
 const backendOrigin = (() => {
   try {
     const url = new URL(import.meta.env.VITE_API_URL);
@@ -44,7 +44,9 @@ export default function ProdutosRelacionados({ produtos }) {
             "
           >
             <img
-              src={toBackendUrl(produto.imagens[0].imagem)}
+              // A CORREÇÃO ESTÁ AQUI:
+              // Usamos produto.__thumb, que é o campo padronizado pelo nosso formatador.
+              src={toBackendUrl(produto.__thumb)}
               alt={produto.nome}
               className="w-full h-64 object-cover"
             />
