@@ -3,7 +3,7 @@ upstream backend {
 }
 
 server {
-	listen 80 default_server;
+	listen ${NGINX_PORT} default_server;
 	server_name _;
 	return 444;  # Fecha a conexão sem resposta, ou 403 Forbidden
 }
@@ -13,8 +13,8 @@ add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
 
 # Frontend
 server {
-    listen 80;
-    server_name compilerhub.store;
+    listen ${NGINX_PORT};
+    server_name ${FRONTEND_DOMAIN};
 
     # Localização dos arquivos de mídia (uploads do Django)
     location /media/ {
@@ -35,8 +35,8 @@ server {
 
 # Backend-API
 server {
-    listen 80;
-    server_name api.compilerhub.store;
+    listen ${NGINX_PORT};
+    server_name ${API_DOMAIN};
 
     location /media/ {
         alias /var/www/media/;
@@ -58,8 +58,8 @@ server {
 
 # Backend-Admin
 server {
-    listen 80;
-    server_name admin.compilerhub.store;
+    listen ${NGINX_PORT};
+    server_name ${ADMIN_DOMAIN};
 
     location /static/ {
         alias /var/www/static/;

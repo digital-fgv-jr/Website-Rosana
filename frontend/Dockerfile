@@ -21,8 +21,9 @@ FROM nginx:1.29.1-alpine
 # Copia os artefatos estáticos do build
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Template de config para suportar $PORT (Heroku/Render) mantendo 80 como default
-COPY nginx-heroku.conf.template /etc/nginx/conf.d/default.conf.template
+RUN mkdir -p /etc/nginx/templates
+COPY nginx-heroku.conf.template /etc/nginx/templates/heroku.conf.template
+COPY nginx-local.conf.template /etc/nginx/templates/local.conf.template
 
 # Entrypoint: aplica envsubst no template para usar $PORT, caindo para 80 se não definido
 COPY docker-entrypoint.sh /docker-entrypoint.sh
