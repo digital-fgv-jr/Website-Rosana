@@ -1,10 +1,10 @@
 services:
   # Override backend to use Django runserver with autoreload
-  backend:
-    entrypoint: ""
-    command: sh -lc "python manage.py migrate --no-input && python manage.py runserver 0.0.0.0:8000"
-    ports:
-      - "8000:8000"
+  #backend:
+  #  entrypoint: ""
+  #  command: sh -lc "python manage.py migrate --no-input && python manage.py runserver 0.0.0.0:8000"
+  #  ports:
+  #    - "8000:8000"
 
   # Add a dev frontend with Vite HMR
   frontend-dev:
