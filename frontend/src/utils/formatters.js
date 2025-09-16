@@ -23,6 +23,26 @@ function normalizeImageUrl(url) {
  * @param {object} produtoDaApi - O objeto de produto vindo do backend.
  * @returns {object} Um objeto de produto formatado.
  */
+
+function normalizeImageUrl(url) {
+  if (!url) return PLACEHOLDER;
+  try {
+    const base = API_BASE ? new URL(API_BASE) : null;
+    const parsed = new URL(url, base || window.location.origin);
+    // Se temos uma base de API definida e o host do URL não bater, reescreve para a base mantendo o caminho
+    if (base && parsed.origin !== base.origin) {
+      return new URL(parsed.pathname + parsed.search + parsed.hash, base).toString();
+    }
+    return parsed.toString();
+  } catch (_e) {
+    // Se for path relativo, prefixa com a base
+    if (API_BASE && String(url).startsWith('/')) {
+      return API_BASE + url;
+    }
+    return url;
+  }
+}
+
 export const formatarProdutoParaFrontend = (produtoDaApi) => {
   if (!produtoDaApi) return null;
 

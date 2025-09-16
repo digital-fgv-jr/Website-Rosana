@@ -1,0 +1,29 @@
+services:
+  # Override backend to use Django runserver with autoreload
+  backend:
+    entrypoint: ""
+    command: sh -lc "python manage.py migrate --no-input && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+
+  # Add a dev frontend with Vite HMR
+  frontend-dev:
+    image: node:24.7-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./.env
+    environment:
+      # Melhora detecção de mudanças no Docker Desktop (Mac/Win)
+      - CHOKIDAR_USEPOLLING=true
+      # Defaults sensatos para dev se não definidos no .env
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+      - VITE_API_KEY=${VITE_API_KEY:-dev-only}
+    command: sh -lc "npm ci && npm run dev -- --host"
+    depends_on:
+      - backend
+    networks:
+      - app_net

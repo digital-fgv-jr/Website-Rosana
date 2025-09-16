@@ -1,6 +1,8 @@
-# Views v6.3.0
+# Views v6.4.0
 
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, mixins, status
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .models import Loja, Categoria, Produto, Pedido

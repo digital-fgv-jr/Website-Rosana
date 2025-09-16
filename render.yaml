@@ -1,0 +1,55 @@
+# Render.com multi-service configuration
+
+services:
+  # Backend (Django + Gunicorn) via Dockerfile
+  - type: web
+    name: rosana-backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    autoDeploy: true
+    plan: starter
+    region: oregon
+    healthCheckPath: /admin/login/
+    numInstances: 1
+    # Render will route to the container's exposed port; backend honors $PORT.
+    disk:
+      name: media
+      mountPath: /usr/src/app/media
+      sizeGB: 1
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: API_KEY
+        sync: false
+      - key: POSTGRES_DB
+        sync: false
+      - key: POSTGRES_USER
+        sync: false
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: POSTGRES_HOST
+        sync: false
+      - key: POSTGRES_PORT
+        value: "5432"
+
+  # Frontend as Static Site (cheaper, CDN)
+  - type: static
+    name: rosana-frontend
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_API_KEY
+        sync: false
+
