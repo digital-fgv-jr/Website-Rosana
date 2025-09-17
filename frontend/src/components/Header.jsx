@@ -50,6 +50,7 @@ export default function Header() {
     }
     setQuery("");
     setSearchOpen(false);
+    window.scrollTo(0, 0);
   }, [query, categoriasSet, navigate]);
 
   const onKeyDown = (e) => {

@@ -51,6 +51,8 @@ export default function HeaderCompact() {
     // A ordenação por relevância é feita na página /joias (snippet abaixo).
     navigate(`/joias?q=${encodeURIComponent(term)}`);
     setQ("");
+
+    window.scrollTo(0, 0);
   };
 
   const onKeyDown = (e) => {
@@ -71,7 +73,7 @@ export default function HeaderCompact() {
           <div className={s.searchBox}>
             <input
               type="search"
-              placeholder="Encontre a sua joia (ex.: anel, pingente, prata, filigrana)"
+              placeholder="Buscar por anel, colar, prata..."
               className={s.searchInput}
               aria-label="Buscar joias"
               value={q}
@@ -81,10 +83,7 @@ export default function HeaderCompact() {
             <Search
               className={s.searchIcon}
               aria-hidden
-              onMouseDown={(e) => {
-                e.preventDefault();
-                goSearch();
-              }}
+              onClick={goSearch}
             />
           </div>
 

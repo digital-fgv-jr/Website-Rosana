@@ -1,4 +1,4 @@
-# Serializers 16.7.0
+# Serializers 17.7.32
 from rest_framework import serializers
 from django.conf import settings
 from django.db import transaction
@@ -138,44 +138,63 @@ class ProdutoDetailSerializer(serializers.ModelSerializer):
         ]
 
 #== Endpoint: /cotar-frete (POST) ==#
-class FreteQuoteSerializer(serializers.Serializer):
-    cep_destino = serializers.CharField(max_length=9, required=True)
+class FreteItemSerializer(serializers.Serializer):
+    """ Serializer auxiliar para validar cada item dentro da lista de cotação. """
     produto_id = serializers.UUIDField(required=True)
-    # Adicione quantidade se necessário, ex: quantidade = serializers.IntegerField(default=1)
+    quantidade = serializers.IntegerField(min_value=1, required=True)
+
+class FreteQuoteSerializer(serializers.Serializer):
+    """
+    Serializer para o endpoint de cotação de frete.
+    Recebe um CEP de destino e uma lista de itens do carrinho.
+    """
+    cep_destino = serializers.CharField(max_length=9, required=True)
+    itens = FreteItemSerializer(many=True, required=True, allow_empty=False)
 
     def validate(self, data):
-        try:
-            # Usamos prefetch_related para otimizar a busca
-            produto = Produto.objects.prefetch_related('categorias__loja__endereco_set').get(pk=data['produto_id'])
-        except Produto.DoesNotExist:
-            raise serializers.ValidationError("Produto não encontrado.")
+        itens_data = data['itens']
+        cep_destino_clean = data['cep_destino'].replace('-', '')
 
-        # ---- INÍCIO DAS VERIFICAÇÕES DE ROBUSTEZ ----
-        categoria = produto.categorias.first()
-        if not categoria:
-            raise serializers.ValidationError(f"O produto '{produto.nome}' não está associado a nenhuma categoria.")
-
-        loja = getattr(categoria, 'loja', None)
-        if not loja:
-            raise serializers.ValidationError(f"A categoria '{categoria.nome_categoria}' não está associada a uma loja.")
-
-        loja_endereco = loja.endereco_set.first()
+        # --- VALIDAÇÃO DO ENDEREÇO DE ORIGEM ---
+        loja_endereco = Endereco.objects.filter(loja__isnull=False).first()
         if not loja_endereco or not loja_endereco.cep:
-            raise serializers.ValidationError(f"A loja '{loja.apelido}' não possui um endereço de origem com CEP cadastrado.")
+            raise serializers.ValidationError("A loja não possui um endereço de origem com CEP cadastrado.")
+        
+        cep_origem_clean = loja_endereco.cep.replace('-', '')
 
-        if not all([produto.altura, produto.largura, produto.comprimento, produto.peso]):
-            raise serializers.ValidationError(f"O produto '{produto.nome}' está com dados de dimensão ou peso faltando.")
-        # ---- FIM DAS VERIFICAÇÕES DE ROBUSTEZ ----
+        # --- PREPARAÇÃO DOS PRODUTOS PARA A API EXTERNA ---
+        produtos_para_api = []
+        produto_ids = [item['produto_id'] for item in itens_data]
 
-        payload = {
-            "from": {"postal_code": loja_endereco.cep.replace('-', '')},
-            "to": {"postal_code": data['cep_destino'].replace('-', '')},
-            "package": {
-                "height": float(produto.altura),
+        # Busca todos os produtos de uma só vez para otimizar
+        produtos_db = Produto.objects.in_bulk(produto_ids)
+
+        if len(produtos_db) != len(set(produto_ids)):
+            raise serializers.ValidationError("Um ou mais IDs de produto são inválidos.")
+
+        for item in itens_data:
+            produto = produtos_db.get(item['produto_id'])
+
+            # Validação de robustez para cada produto
+            if not all([produto.altura, produto.largura, produto.comprimento, produto.peso]):
+                raise serializers.ValidationError(f"O produto '{produto.nome}' está com dados de dimensão ou peso faltando.")
+
+            produtos_para_api.append({
+                "id": str(produto.id),
                 "width": float(produto.largura),
+                "height": float(produto.altura),
                 "length": float(produto.comprimento),
-                "weight": float(produto.peso)
-            }
+                "weight": float(produto.peso),
+                "insurance_value": float(produto.preco),
+                "quantity": item['quantidade']
+            })
+
+        # --- MONTAGEM DO PAYLOAD E CHAMADA À API ---
+        # A API da Melhor Envio espera uma chave "products" para múltiplos itens
+        payload = {
+            "from": {"postal_code": cep_origem_clean},
+            "to": {"postal_code": cep_destino_clean},
+            "products": produtos_para_api
         }
         
         headers = {
@@ -191,7 +210,12 @@ class FreteQuoteSerializer(serializers.Serializer):
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:
-            error_details = e.response.json() if e.response and e.response.headers.get('Content-Type') == 'application/json' else str(e.response.text)
+            error_details = str(e)
+            if e.response:
+                try:
+                    error_details = e.response.json()
+                except json.JSONDecodeError:
+                    error_details = e.response.text
             raise serializers.ValidationError(f"Erro ao cotar frete com a Melhor Envio: {error_details}")
 
 #======================================================================

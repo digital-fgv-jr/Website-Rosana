@@ -3,20 +3,6 @@ import apiClient from '../api';
 /**
  * Busca a lista de todas as categorias de produtos.
  * @returns {Promise<object>} A resposta da API contendo a lista de categorias.
- * @example
- * // Exemplo de response.data:
- * [
- * {
- * "id": "f4g5h6j7-k8l9-1011-1213-141516abcdef",
- * "nome_categoria": "Anel",
- * "nome_plural": "Anéis",
- * "loja": {
- * "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
- * "apelido": "Rô Alves Jewellery"
- * },
- * "primeira_imagem": "http://127.0.0.1:8000/media/images/exemplo_anel.webp"
- * }
- * ]
  */
 export const getCategorias = () => {
   return apiClient.get('/categorias/');
@@ -29,4 +15,24 @@ export const getCategorias = () => {
  */
 export const getCategoriaById = (id) => {
   return apiClient.get(`/categorias/${id}/`);
+};
+
+/**
+ * Busca as 'n' categorias com mais produtos.
+ * @param {number} n - O número de categorias a serem retornadas.
+ * @returns {Promise<object>} A resposta da API contendo a lista das top categorias.
+ * @example
+ * // Exemplo de response.data para getTopCategorias(5):
+ * [
+ * {
+ * "id": "uuid-da-categoria-1",
+ * "nome_categoria": "Anel",
+ * "nome_plural": "Anéis",
+ * "primeira_imagem": "http://127.0.0.1:8000/media/images/imagem_anel.webp"
+ * },
+ * // ... (outras 4 categorias)
+ * ]
+ */
+export const getTopCategorias = (n) => {
+  return apiClient.get(`/categorias/top/${n}/`);
 };

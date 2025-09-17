@@ -108,3 +108,77 @@ html, body { scroll-behavior: smooth; }
   font-style: normal;
   font-display: swap;
 }
+
+.categorias-carousel .swiper-button-prev,
+.categorias-carousel .swiper-button-next {
+  display: none !important; 
+}
+
+
+/* Estilo base para os botões de navegação customizados */
+.custom-nav-button {
+  position: absolute;
+  top: 30%; /* Centraliza verticalmente com o container */
+  transform: translateY(-30%); /* Ajuste para centralizar o próprio botão */
+  width: 44px; /* Mantém a largura do botão */
+  height: 44px; /* Mantém a altura do botão */
+  background-color: transparent;
+  color: #1c2c3c; /* Cor escura */
+  cursor: pointer;
+  z-index: 10; /* Garante que estejam acima de outros elementos */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease-in-out;
+}
+
+.custom-nav-button:hover {
+  color: #c9bd8f; /* Cor dourada/bege */
+}
+
+/* Ícones dos botões - AUMENTADO O TAMANHO DA FONTE */
+.custom-nav-button::after {
+  font-family: 'swiper-icons'; /* Usa a fonte de ícones do Swiper */
+  font-size: 36px; /* Aumentei o tamanho da fonte do ícone */
+  text-transform: none !important;
+  letter-spacing: 0;
+  font-variant: initial;
+  line-height: 1;
+}
+
+.swiper-button-prev-custom::after {
+  content: 'prev'; /* Conteúdo do ícone de "anterior" */
+}
+
+.swiper-button-next-custom::after {
+  content: 'next'; /* Conteúdo do ícone de "próximo" */
+}
+
+
+/* Posição específica dos botões */
+.swiper-button-prev-custom {
+  left: -20px; /* Ajustado um pouco mais para fora */
+}
+.swiper-button-next-custom {
+  right: -20px; /* Ajustado um pouco mais para fora */
+}
+
+/* Medias queries para ajustar o posicionamento e garantir que não fiquem colados */
+@media (min-width: 768px) {
+  .swiper-button-prev-custom {
+    left: -60px; /* Mais para fora em telas maiores */
+  }
+  .swiper-button-next-custom {
+    right: -60px; /* Mais para fora em telas maiores */
+  }
+}
+
+/* Em telas muito pequenas, pode ser necessário ajustar a distância lateral para não ficarem escondidos */
+@media (max-width: 639px) {
+  .swiper-button-prev-custom {
+    left: 2px;
+  }
+  .swiper-button-next-custom {
+    right: 2px;
+  }
+}

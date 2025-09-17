@@ -3,7 +3,7 @@
   /* cores */
   --bg: #faf9f6;
   --fg: #1c2c3c;
-  --beige: #F7E7CE; /* fundo da busca */
+  --beige: #FDF4E3; /* fundo da busca */
 
   /* search (compacta) */
   --search-width-min: 240px;
@@ -89,7 +89,7 @@
   width: var(--search-icon-size);
   height: var(--search-icon-size);
   color: var(--fg);
-  pointer-events: none;
+  cursor: pointer;
 }
 
 /* ====== AÇÕES À DIREITA (insta + carrinho) ====== */

@@ -29,15 +29,17 @@ export default function Inicio() {
       
       <HeaderCompact />
 
+        
       <HeroCarousel />
 
       <main className="flex-grow flex flex-col items-center justify-center bg-[#faf9f6] space-y-8">
-        <h1 className="font-RoxboroughCFBold text-[clamp(2rem,8vw,7rem)] text-center text-[#1c2c3c]">
+        <h1 className="font-RoxboroughCFBold text-[clamp(2rem,7vw,6.5rem)] text-center text-[#1c2c3c]">
           SUA NOVA JOIA
         </h1>
       </main>
 
       <Categorias />
+      
       <ThreeImagesSection />
       <WhatsApp />
       <Cookies />
