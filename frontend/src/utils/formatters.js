@@ -4,18 +4,20 @@ const PLACEHOLDER = '/placeholder.svg';
 
 function normalizeImageUrl(url) {
   if (!url) return PLACEHOLDER;
-  // Em dev, a VITE_API_URL é '/api', que não é uma base de URL válida.
-  // Nesse caso, o proxy do Vite já resolve o caminho, então o caminho relativo já funciona.
-  if (API_BASE.startsWith('http')) {
-    try {
-      // Em produção, montamos a URL completa.
-      return new URL(url, API_BASE).toString();
-    } catch (e) {
-      return url; // Fallback
-    }
+  
+  // Se a URL já for absoluta (começa com http), não faz nada
+  if (url.startsWith('http')) {
+    return url;
   }
-  // Para ambiente de dev com proxy, o caminho relativo como está já é o correto.
-  return url;
+  
+  // Se for relativa, constrói a URL completa usando a base da API
+  try {
+    // Garante que a VITE_API_URL seja uma base válida
+    const base = API_BASE.startsWith('http') ? API_BASE : window.location.origin;
+    return new URL(url, base).toString();
+  } catch (e) {
+    return url; // Fallback
+  }
 }
 
 /**
