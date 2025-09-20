@@ -1,13 +1,13 @@
 import { Endereco, ErroCep, ResultadoConsultaCep, EnderecoViaCEP, RespostaViaCEP } from "./interfaces/enderecoCepInterfaces"
 
-export const consultarCep = async (cep: string): Promise<ResultadoConsultaCep> => {
+export const consultarCep = async (cep: string): Promise<{ data: ResultadoConsultaCep }> => {
   // Validação do CEP
   const cepLimpo: string = String(cep).replace(/\D/g, '');
   if (cepLimpo.length !== 8) {
-    return {
+    return {data: {
       error: true,
       message: 'Formato de CEP inválido.',
-    } as ErroCep;
+    } as ErroCep}
   }
 
   // Busca na API
@@ -22,14 +22,14 @@ export const consultarCep = async (cep: string): Promise<ResultadoConsultaCep> =
     const data = (await response.json()) as RespostaViaCEP;
 
     if ('erro' in data && data.erro) {
-      return {
+      return {data: {
       error: true,
       message: 'CEP não encontrado.',
-      } as ErroCep;
+      } as ErroCep}
     }
 
     const enderecoData = data as EnderecoViaCEP;
-    return {
+    return {data: {
       cep: enderecoData.cep,
       logradouro: enderecoData.logradouro,
       bairro: enderecoData.bairro,
@@ -38,12 +38,12 @@ export const consultarCep = async (cep: string): Promise<ResultadoConsultaCep> =
       ibge: enderecoData.ibge,
       ddd: enderecoData.ddd,
       error: false,
-    } as Endereco;
+    } as Endereco}
   } catch (error) {
     console.error('Erro ao buscar o CEP:', error);
-    return {
+    return {data: {
       error: true,
       message: 'Não foi possível consultar o CEP. Tente novamente mais tarde.',
-    } as ErroCep;
+    } as ErroCep}
   }
 };

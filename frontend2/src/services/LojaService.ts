@@ -1,12 +1,12 @@
 import apiClient from './api/apiClient';
 import { Loja, UUID } from './interfaces/apiInterfaces';
 
-export const getLojas = async (): Promise<Loja[]> => {
+export const getLojas = async (): Promise<{ data: Loja[] }> => {
   const response = await apiClient.get<Loja[]>('/lojas/');
-  return response.data;
+  return { data: response.data };
 };
 
-export const getLojaById = async (id: UUID): Promise<Loja> => {
+export const getLojaById = async (id: UUID): Promise<{data: Loja }> => {
   const response = await apiClient.get<Loja>(`/lojas/${id}/`);
-  return response.data;
+  return { data: response.data };
 };

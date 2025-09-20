@@ -1,7 +1,7 @@
 import apiClient from './api/apiClient';
 import { FreteQuoteInput, FreteOption } from './interfaces/apiInterfaces';
 
-export const cotarFrete = async (data: FreteQuoteInput): Promise<FreteOption[]> => {
+export const cotarFrete = async (data: FreteQuoteInput): Promise<{ data: FreteOption[] }> => {
   const response = await apiClient.post<FreteOption[]>('/cotar-frete/', data);
-  return response.data;
+  return { data: response.data };
 };

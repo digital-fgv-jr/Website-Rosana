@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ApiFunc, UseApiReturn } from "./interfaces/UseApi"
+import { ApiFunc, UseApiReturn } from "./interfaces/UseApiInterfaces"
 
 export function useApi<T> (apiFunc: ApiFunc<T>, ...params: any[]): UseApiReturn<T> {
     const [data, setData] = useState<T | null>(null);

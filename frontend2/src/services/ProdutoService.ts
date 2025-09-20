@@ -6,17 +6,17 @@ interface ProdutoQueryParams {
   'categorias__id'?: string; // Filtro por categoria
 }
 
-export const getProdutos = async (params?: ProdutoQueryParams): Promise<ProdutoListItem[]> => {
+export const getProdutos = async (params?: ProdutoQueryParams): Promise<{ data: ProdutoListItem[] }> => {
   const response = await apiClient.get<ProdutoListItem[]>('/produtos/', { params });
-  return response.data;
+  return { data: response.data };
 };
 
-export const getProdutoById = async (id: string): Promise<ProdutoDetail> => {
+export const getProdutoById = async (id: string): Promise<{ data: ProdutoDetail }> => {
   const response = await apiClient.get<ProdutoDetail>(`/produtos/${id}/`);
-  return response.data;
+  return { data: response.data };
 };
 
-export const getProdutosRelacionados = async (id: string): Promise<ProdutoListItem[]> => {
+export const getProdutosRelacionados = async (id: string): Promise<{ data: ProdutoListItem[] }> => {
   const response = await apiClient.get<ProdutoListItem[]>(`/produtos/${id}/relacionados`);
-  return response.data;
+  return { data: response.data };
 };
