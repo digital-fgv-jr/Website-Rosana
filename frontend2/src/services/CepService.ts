@@ -1,4 +1,4 @@
-import { Endereco, ErroCep, ResultadoConsultaCep, EnderecoViaCEP, RespostaViaCEP } from "./interfaces/enderecoCepInterfaces"
+import { EnderecoViaCepResult, ErroCep, ResultadoConsultaCep, EnderecoViaCEP, RespostaViaCEP } from "./interfaces/enderecoCepInterfaces"
 
 export const consultarCep = async (cep: string): Promise<{ data: ResultadoConsultaCep }> => {
   // Validação do CEP
@@ -38,7 +38,7 @@ export const consultarCep = async (cep: string): Promise<{ data: ResultadoConsul
       ibge: enderecoData.ibge,
       ddd: enderecoData.ddd,
       error: false,
-    } as Endereco}
+    } as EnderecoViaCepResult}
   } catch (error) {
     console.error('Erro ao buscar o CEP:', error);
     return {data: {

@@ -1,4 +1,4 @@
-export interface Endereco {
+export interface EnderecoViaCepResult {
   cep: string;
   logradouro: string;
   bairro: string;
@@ -32,4 +32,4 @@ export interface ErroViaCEP {
 }
 
 export type RespostaViaCEP = EnderecoViaCEP | ErroViaCEP;
-export type ResultadoConsultaCep = Endereco | ErroCep;
+export type ResultadoConsultaCep = EnderecoViaCepResult | ErroCep;
